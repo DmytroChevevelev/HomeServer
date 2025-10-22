@@ -18,11 +18,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '22'
+
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli
 
       - name: Install dependencies
         run: npm install
+        working-directory: ${{ github.workspace }}/WebClient/home-web-client
 
       - name: Build project
-        run: npm run build
-        working-directory: ${{ github.workspace }}/../WebClient/home-web-client
+        run: ng build
+        working-directory: ${{ github.workspace }}/WebClient/home-web-client
