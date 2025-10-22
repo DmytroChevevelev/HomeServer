@@ -20,11 +20,12 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Install Angular CLI
         run: npm install -g @angular/cli
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ${{ github.workspace }}/WebClient/home-web-client
 
       - name: Build project
         run: ng build
