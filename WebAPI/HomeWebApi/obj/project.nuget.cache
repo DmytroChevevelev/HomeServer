@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "dgSpecHash": "GYC9gSGyghw=",
+  "success": true,
+  "projectFilePath": "C:\\Projects\\Local\\HomeServer\\WebAPI\\HomeWebApi\\HomeWebApi.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\dmytro.chevelev\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.10\\microsoft.aspnetcore.openapi.9.0.10.nupkg.sha512",
+    "C:\\Users\\dmytro.chevelev\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://pkgs.dev.azure.com/MidmarkDiagnostics/_packaging/MidmarkDiagnostics/nuget/v3/index.json.",
+      "projectPath": "C:\\Projects\\Local\\HomeServer\\WebAPI\\HomeWebApi\\HomeWebApi.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Projects\\Local\\HomeServer\\WebAPI\\HomeWebApi\\HomeWebApi.csproj",
+      "targetGraphs": []
+    },
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://pkgs.dev.azure.com/MidmarkDiagnostics/_packaging/MidmarkNugetPackages/nuget/v3/index.json.",
+      "projectPath": "C:\\Projects\\Local\\HomeServer\\WebAPI\\HomeWebApi\\HomeWebApi.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Projects\\Local\\HomeServer\\WebAPI\\HomeWebApi\\HomeWebApi.csproj",
+      "targetGraphs": []
+    },
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://pkgs.dev.azure.com/Midmark/d6cb4f66-7637-40fa-90ee-30161f75f0de/_packaging/Diagnostics/nuget/v3/index.json.",
+      "projectPath": "C:\\Projects\\Local\\HomeServer\\WebAPI\\HomeWebApi\\HomeWebApi.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Projects\\Local\\HomeServer\\WebAPI\\HomeWebApi\\HomeWebApi.csproj",
+      "targetGraphs": []
+    }
+  ]
+}
