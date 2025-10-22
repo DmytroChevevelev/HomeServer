@@ -22,8 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: ${{ github.workspace }}
 
       - name: Build project
         run: npm run build
-        working-directory: ${{ github.workspace }}/WebClient/home-web-client
+        working-directory: ${{ github.workspace }}/../WebClient/home-web-client
