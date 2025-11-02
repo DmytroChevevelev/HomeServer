@@ -327,3 +327,6 @@ ASALocalRun/
 
 # NVidia Nsight GPU debugger configuration file
 *.nvuser
+WebAPI/HomeWebApi/obj/Debug/net9.0/HomeWebApi.AssemblyInfo.cs
+WebAPI/HomeWebApi/obj/Debug/net9.0/HomeWebApi.AssemblyInfoInputs.cache
+WebAPI/HomeWebApi/obj/Debug/net9.0/HomeWebApi.GeneratedMSBuildEditorConfig.editorconfig
