@@ -12,5 +12,12 @@ namespace MyApp.Namespace
         {
             return Ok(new { message = "Hello from MyController!" });
         }
+
+        [HttpPost]
+        public IActionResult Post([FromBody] object data)
+        {
+            return Ok(new { received = data });
+        }
+
     }
 }
