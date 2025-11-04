@@ -1,0 +1,21 @@
+<section class="sensor-list">
+  <h2>Sensors</h2>
+
+  <ng-container *ngIf="sensors$ | async as sensors; else loading">
+    <p *ngIf="sensors.length === 0">No sensors found.</p>
+    <ul *ngIf="sensors.length > 0">
+      <li *ngFor="let s of sensors">
+        <strong>{{ s.name }}</strong>
+        <div class="meta">{{ s.type }} · {{ s.location }} ·
+          <span [class.inactive]="!s.isActive">{{ s.isActive ? 'Active' : 'Inactive' }}</span>
+        </div>
+        <p class="desc">{{ s.description }}</p>
+        <small class="updated">Last updated: {{ s.lastUpdated }}</small>
+      </li>
+    </ul>
+  </ng-container>
+
+  <ng-template #loading>
+    <p>Loading sensors…</p>
+  </ng-template>
+</section>

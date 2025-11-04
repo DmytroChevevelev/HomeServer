@@ -13,6 +13,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<HomeSensorsContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("HomeSensorsDatabase")));
 
+// CORS: allow the Angular dev server to call this API during development
+var MyAllowSpecificOrigins = "AllowLocalDev";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200", "http://127.0.0.1:4200", "http://localhost:5173")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -23,6 +36,12 @@ if (app.Environment.IsDevelopment())
     {
         options.DocumentPath = "/openapi/v1.json";
     });
+}
+
+// Use CORS in Development so the client can call the API
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors(MyAllowSpecificOrigins);
 }
 
 app.UseHttpsRedirection();
