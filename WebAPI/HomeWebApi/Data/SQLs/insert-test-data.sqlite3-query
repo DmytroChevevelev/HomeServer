@@ -1,0 +1,6 @@
+-- database: ../../HomeSensors.db
+
+INSERT INTO Sensors (Id, Name, Description, Type, Location, IsActive, LastUpdated) 
+VALUES (1, 'Temperature Sensor', 'Test temperature sensor', 'Temperature', 'Living Room', true, '2024-01-15 10:00:00');
+
+SELECT * FROM Sensors;
