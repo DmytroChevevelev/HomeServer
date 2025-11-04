@@ -1,3 +1,4 @@
+using HomeWebApi.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,10 +8,17 @@ namespace MyApp.Namespace
     [ApiController]
     public class SensorController : ControllerBase
     {
+        private readonly HomeSensorsContext _dbContext;
+        public SensorController(HomeSensorsContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(new { message = "Hello from MyController!" });
+            var sensors = _dbContext.Sensors.ToList();
+            return Ok(sensors);
         }
 
         [HttpPost]
