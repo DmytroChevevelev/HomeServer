@@ -38,3 +38,15 @@ npm run test
 
 - The frontend expects the backend CORS configuration to allow the local Angular origin.
 - Backend API documentation is available separately at `/swagger` when the API is running in development mode.
+
+## Device Pages Route Overview
+
+- `/devices`: main device list page (dashboard view)
+- `/devices/:deviceId`: device details page with history section and date-time filter
+- `/devices/register`: device registration page
+
+## TODO:
+- The list of devices should display all registered devices in the database. Use /api/devices endpoint from backend.
+- The list should have filter by status of device
+- Angular template staff MUST be removed
+- Use style of control like standard bootstrap UI

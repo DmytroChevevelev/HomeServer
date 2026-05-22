@@ -1,4 +1,4 @@
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 
 export interface RegisterDeviceRequest {
   externalId: string;
@@ -6,9 +6,16 @@ export interface RegisterDeviceRequest {
   sensorType: string;
 }
 
+type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+
 export class DevicesApiService {
+  constructor(
+    private readonly fetchFn: FetchFn = fetch,
+    private readonly apiBaseUrl: string = environment.apiBaseUrl
+  ) {}
+
   async register(payload: RegisterDeviceRequest): Promise<Response> {
-    return fetch(`${environment.apiBaseUrl}/devices`, {
+    return this.fetchFn(`${this.apiBaseUrl}/devices`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -16,6 +23,6 @@ export class DevicesApiService {
   }
 
   async list(): Promise<Response> {
-    return fetch(`${environment.apiBaseUrl}/devices`);
+    return this.fetchFn(`${this.apiBaseUrl}/devices`);
   }
 }

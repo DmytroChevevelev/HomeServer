@@ -157,3 +157,4 @@ D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\bin\Debug\net9.0\Sm
 D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\obj\Debug\net9.0\swae.build.ex.cache
 D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\obj\Debug\net9.0\SmartHome.Api.xml
+D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\bin\Debug\net9.0\package-lock.json

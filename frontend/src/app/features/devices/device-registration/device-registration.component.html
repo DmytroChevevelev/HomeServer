@@ -1,0 +1,24 @@
+<section class="device-registration-page">
+  <h1>Register Device</h1>
+
+  <form class="registration-form" (ngSubmit)="submitForm()">
+    <label>
+      External ID
+      <input type="text" name="externalId" [(ngModel)]="externalId" required />
+    </label>
+
+    <label>
+      Name
+      <input type="text" name="name" [(ngModel)]="name" required />
+    </label>
+
+    <label>
+      Sensor Type
+      <input type="text" name="sensorType" [(ngModel)]="sensorType" required />
+    </label>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <p *ngIf="submitMessage">{{ submitMessage }}</p>
+</section>

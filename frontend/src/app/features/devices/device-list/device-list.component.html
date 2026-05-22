@@ -1,0 +1,57 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Devices</h1>
+  <a class="btn btn-primary btn-sm" routerLink="/devices/register">Register Device</a>
+</div>
+
+<div *ngIf="uiState.status === 'loading'" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="uiState.status === 'error'" class="alert alert-danger" role="alert">
+  {{ uiState.errorMessage || 'Unable to load devices.' }}
+</div>
+
+<div *ngIf="uiState.status === 'empty'" class="alert alert-info" role="alert">
+  No devices registered yet.
+</div>
+
+<ng-container *ngIf="uiState.status === 'ready'">
+  <div class="mb-3">
+    <select
+      class="form-select form-select-sm w-auto"
+      (change)="setFilter($any($event.target).value)"
+      [value]="selectedStatus">
+      <option value="all">All Statuses</option>
+      <option value="online">Online</option>
+      <option value="offline">Offline</option>
+      <option value="unknown">Unknown</option>
+    </select>
+  </div>
+
+  <div *ngIf="filteredDevices.length === 0 && selectedStatus !== 'all'" class="alert alert-warning" role="alert">
+    No devices match the selected status.
+  </div>
+
+  <table *ngIf="filteredDevices.length > 0" class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">External ID</th>
+        <th scope="col">Type</th>
+        <th scope="col">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let device of filteredDevices">
+        <td>{{ device.name }}</td>
+        <td><code>{{ device.externalId }}</code></td>
+        <td>{{ device.deviceType }}</td>
+        <td>
+          <span [ngClass]="badgeClass(device.status)">{{ device.status }}</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-container>

@@ -13,6 +13,16 @@
 - `cd frontend`
 - `npm install`
 - `npm run start`
+- `npm install bootstrap` *(first-time setup: Bootstrap 5 is a required dependency)*
+
+### Frontend Tests
+- `npx ng test --watch=false --browsers=ChromeHeadless` — run all frontend unit tests
+- `npx ng test --watch=false --browsers=ChromeHeadless --include='src/app/features/devices/**/*.spec.ts'` — run device feature tests only
+
+### Device List Status Filter
+The device list at `/devices` provides a client-side status filter (All / Online / Offline / Unknown).
+Filtering is performed in-memory — no additional API calls are made when changing the filter selection.
+API status values `active` → `online` and `stale` → `offline` are mapped in `DevicePagesFacade.normalizeStatus()`.
 
 ## Simulator
 - `dotnet run --project simulator/src/SmartHome.Simulator/SmartHome.Simulator.csproj`
