@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: Smart Home API Docs and Operation Metadata Alignment
+  version: 1.0.0
+  description: |
+    Contract for documentation endpoint availability plus required OpenAPI metadata
+    coverage for API operations modified in this feature.
+servers:
+  - url: http://localhost:5151
+paths:
+  /swagger:
+    get:
+      summary: Documentation UI entry endpoint
+      operationId: getSwaggerUi
+      responses:
+        '200':
+          description: Documentation UI is available
+        '404':
+          description: Documentation UI is disabled by environment policy
+  /swagger/index.html:
+    get:
+      summary: Documentation UI index page
+      operationId: getSwaggerUiIndex
+      responses:
+        '200':
+          description: Documentation UI index page is available
+        '404':
+          description: Documentation UI is disabled by environment policy
+  /swagger/v1/swagger.json:
+    get:
+      summary: Machine-readable OpenAPI contract document
+      operationId: getOpenApiDocument
+      responses:
+        '200':
+          description: OpenAPI document is available
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: OpenAPI document is disabled by environment policy
+
+x-operationDocumentationRequirements:
+  sourceOfTruth: specs/002-swagger-endpoints/contracts/openapi-docs.yaml
+  rules:
+    - operation metadata for each modified endpoint MUST include summary
+    - endpoint parameters MUST include descriptions when parameters exist
+    - documented responses MUST include descriptions for success and failure codes
+  requiredOperations:
+    - path: /api/devices
+      method: post
+      requiredResponses: ['201', '400', '409']
+    - path: /api/devices
+      method: get
+      requiredResponses: ['200']
+    - path: /api/telemetry
+      method: post
+      requiredResponses: ['202', '400', '404', '429']
+    - path: /api/telemetry/latest
+      method: get
+      requiredResponses: ['200']
+components: {}
