@@ -23,3 +23,9 @@ coverage/
 Thumbs.db
 .vscode/
 .idea/
+
+# Specific to this project
+./backend/src/SmartHome.Api/bin/
+./backend/src/SmartHome.Api/obj/
+./simulator/SmartHome.DeviceSimulator/bin/
+./simulator/SmartHome.DeviceSimulator/obj/

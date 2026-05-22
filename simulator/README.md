@@ -29,9 +29,51 @@ The simulator reads these settings from `appsettings.json`:
 - Uses `Ctrl+C` to stop gracefully.
 - Assumes the target device already exists in the backend.
 
-## TODO:
-- implement device registration behavior.
-    - console gets command from input and send request to the backend
-    - there are three command: "register-device", "start-send-telemetry" and "stop-send-telemetry"
-    - configuration should allow to configure an interval between telemetry data. By default - 2sec.
-    - values for telemetry should come from additional file with the same name as device name
+## Commands and Runtime
+
+The simulator runtime is command-driven and supports these commands:
+
+- `register-device`
+- `start-send-telemetry`
+- `stop-send-telemetry`
+
+Example command session:
+
+```text
+> register-device
+register-device: success (201)
+
+> start-send-telemetry
+start-send-telemetry: started with interval 2s
+
+> stop-send-telemetry
+stop-send-telemetry: stopped
+```
+
+Telemetry profile files are resolved by device name convention. A profile should be placed at:
+
+`profiles/<DeviceName>.json`
+
+Where `<DeviceName>` comes from simulator configuration.
+
+Telemetry profile file format example:
+
+```json
+{
+	"metrics": [
+		{
+			"metricType": "temperature",
+			"metricValue": 21.5
+		},
+		{
+			"metricType": "humidity",
+			"metricValue": 45.2
+		}
+	]
+}
+```
+
+## Notes
+
+- `start-send-telemetry` requires a valid device profile file matching `DeviceName`.
+- If `SendIntervalSeconds` is absent, zero, or invalid, the simulator falls back to 2 seconds.
