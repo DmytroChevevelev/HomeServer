@@ -7,10 +7,11 @@ export interface RegisterDeviceRequest {
 }
 
 type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+const defaultFetch: FetchFn = (input, init) => globalThis.fetch(input, init);
 
 export class DevicesApiService {
   constructor(
-    private readonly fetchFn: FetchFn = fetch,
+    private readonly fetchFn: FetchFn = defaultFetch,
     private readonly apiBaseUrl: string = environment.apiBaseUrl
   ) {}
 
@@ -23,6 +24,8 @@ export class DevicesApiService {
   }
 
   async list(): Promise<Response> {
-    return this.fetchFn(`${this.apiBaseUrl}/devices`);
+    return this.fetchFn(`${this.apiBaseUrl}/devices`, {
+      method: 'GET'
+    });
   }
 }

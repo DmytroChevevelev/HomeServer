@@ -32,6 +32,18 @@ The launch profile starts the API in `Development` and binds to `http://localhos
 
 Swagger is enabled in development and blocked by default in non-development environments.
 
+## Local CORS Origins
+
+The backend uses an explicit allowlist from `Cors:AllowedOrigins` for browser requests.
+
+Default development origins:
+- `http://localhost:4200`
+- `http://localhost:4201`
+- `http://127.0.0.1:4200`
+
+For browser requests to endpoints like `/api/devices`, the response includes
+`Access-Control-Allow-Origin` only when the request origin matches the configured allowlist.
+
 ## Database Sync Workflow
 
 Use operator-run EF Core commands to keep schema state current. Startup automatic migration execution is intentionally disabled.

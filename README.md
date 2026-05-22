@@ -64,3 +64,4 @@ dotnet test backend/tests/SmartHome.Api.IntegrationTests/SmartHome.Api.Integrati
 - The backend exposes Swagger UI in development mode at `/swagger`.
 - Database schema updates are operator-run using EF Core migration commands.
 - The current feature branch is `003-update-db-docs`.
+- Browser API consumers must use an origin included in backend `Cors:AllowedOrigins`; otherwise browser calls (for example `/api/devices`) are blocked by CORS even when endpoint health is OK.

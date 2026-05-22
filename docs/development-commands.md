@@ -34,3 +34,15 @@ API status values `active` → `online` and `stale` → `offline` are mapped in 
 ## Validation
 - `pwsh scripts/apply-db-migrations.ps1`
 - `pwsh scripts/validate-mvp.ps1`
+
+## CORS Troubleshooting (`/api/devices`)
+- Supported local frontend origins (development default):
+	- `http://localhost:4200`
+	- `http://localhost:4201`
+	- `http://127.0.0.1:4200`
+- Quick check for allowed origin header:
+	- `Invoke-WebRequest -Uri http://localhost:5151/api/devices -Headers @{ Origin = 'http://localhost:4201' } | Select-Object -ExpandProperty Headers`
+- If Swagger works but frontend fails:
+	- Confirm frontend origin matches one of the supported origins above.
+	- Confirm backend was restarted after changes to `appsettings.Development.json`.
+	- Check browser DevTools for CORS error details and origin value.

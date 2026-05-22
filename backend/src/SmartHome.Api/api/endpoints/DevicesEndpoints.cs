@@ -62,10 +62,15 @@ public static class DevicesEndpoints
         })
         .WithName("listDevices")
         .WithSummary("List devices with latest telemetry")
-        .WithDescription("Returns registered devices and latest telemetry projections.")
+        .WithDescription("Returns registered devices and latest telemetry projections. Browser clients must call from origins allowed by configured CORS policy.")
         .WithOpenApi(operation =>
         {
             operation.Responses["200"].Description = "Device list with latest telemetry projection was returned.";
+            operation.Responses["200"].Headers ??= new Dictionary<string, Microsoft.OpenApi.Models.OpenApiHeader>();
+            operation.Responses["200"].Headers["Access-Control-Allow-Origin"] = new Microsoft.OpenApi.Models.OpenApiHeader
+            {
+                Description = "Present for browser requests from origins configured in CORS allowlist."
+            };
             return operation;
         })
         .Produces<IEnumerable<DeviceLatestTelemetryResponse>>(StatusCodes.Status200OK);

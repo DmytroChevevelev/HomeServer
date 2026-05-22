@@ -13,4 +13,15 @@ describe('DeviceRegistrationComponent', () => {
     const component = fixture.componentInstance;
     expect(component).toBeTruthy();
   });
+
+  it('handles rejected submit promise and sets error message', async () => {
+    const fixture = TestBed.createComponent(DeviceRegistrationComponent);
+    const component = fixture.componentInstance;
+
+    spyOn(component, 'submit').and.rejectWith(new Error('network down'));
+
+    await component.submitForm();
+
+    expect(component.submitMessage).toBe('Registration failed. Unable to reach API.');
+  });
 });

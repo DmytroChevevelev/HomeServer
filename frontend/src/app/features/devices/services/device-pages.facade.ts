@@ -11,6 +11,7 @@ import { mapCollectionState, mapDetailState } from './device-pages-state.mapper'
 import { DevicesApiService } from './devices-api.service';
 
 type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+const defaultFetch: FetchFn = (input, init) => globalThis.fetch(input, init);
 
 interface DeviceApiDto {
   id?: string;
@@ -21,7 +22,9 @@ interface DeviceApiDto {
   type?: string;
   status?: string;
   latestValue?: number | null;
+  latestMetricValue?: number | null;
   lastUpdatedUtc?: string | null;
+  latestEventTimeUtc?: string | null;
 }
 
 interface TelemetryApiDto {
@@ -49,7 +52,7 @@ export interface DeviceHistoryResult {
 export class DevicePagesFacade {
   constructor(
     private readonly devicesApi: DevicesApiService = new DevicesApiService(),
-    private readonly fetchFn: FetchFn = fetch,
+    private readonly fetchFn: FetchFn = defaultFetch,
     private readonly apiBaseUrl: string = environment.apiBaseUrl
   ) {}
 
@@ -57,6 +60,11 @@ export class DevicePagesFacade {
     try {
       const response = await this.devicesApi.list();
       if (!response.ok) {
+        console.warn('[DevicePagesFacade.getDeviceList] Request returned non-OK status.', {
+          status: response.status,
+          statusText: response.statusText,
+          apiBaseUrl: this.apiBaseUrl
+        });
         return {
           state: mapCollectionState<DeviceListItemViewModel>(null, false, 'Unable to load devices.'),
           items: []
@@ -70,7 +78,11 @@ export class DevicePagesFacade {
         state: mapCollectionState(items, false),
         items
       };
-    } catch {
+    } catch (error) {
+      console.error('[DevicePagesFacade.getDeviceList] Failed to load devices.', {
+        apiBaseUrl: this.apiBaseUrl,
+        error
+      });
       return {
         state: mapCollectionState<DeviceListItemViewModel>(null, false, 'Unable to load devices.'),
         items: []
@@ -151,7 +163,7 @@ export class DevicePagesFacade {
 
   private mapDeviceListItem(dto: DeviceApiDto): DeviceListItemViewModel {
     const status = this.normalizeStatus(dto.status);
-    const latestValue = dto.latestValue ?? null;
+    const latestValue = dto.latestMetricValue ?? dto.latestValue ?? null;
 
     return {
       deviceId: dto.id ?? dto.deviceId ?? '',

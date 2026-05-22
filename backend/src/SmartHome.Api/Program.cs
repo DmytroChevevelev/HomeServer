@@ -36,16 +36,26 @@ builder.Services.AddSwaggerGen(options =>
     }
 });
 
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+var allowedOrigins = (builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>())
+    .Select(origin => origin.Trim().TrimEnd('/'))
+    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
+        // Keep explicit allowlist behavior to avoid accidental wildcard exposure.
         policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
+
+if (allowedOrigins.Length == 0)
+{
+    app.Logger.LogWarning("Cors:AllowedOrigins is empty; browser clients will be blocked by CORS policy until origins are configured.");
+}
 
 var migrationLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("DatabaseMigration");
 var logMigrationStateOnStartup = builder.Configuration.GetValue("Database:LogMigrationStateOnStartup", true);

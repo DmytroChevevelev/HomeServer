@@ -2,6 +2,34 @@ import { DevicePagesFacade } from './device-pages.facade';
 import { DevicesApiService } from './devices-api.service';
 
 describe('DevicePagesFacade', () => {
+  it('maps backend latestMetricValue to latestValueDisplay', async () => {
+    const fetchMock = jasmine.createSpy('fetchMock').and.resolveTo(
+      new Response(
+        JSON.stringify([
+          {
+            deviceId: 'd-1',
+            externalId: 'EXT-1',
+            name: 'Living Room Sensor',
+            sensorType: 'temperature',
+            status: 'online',
+            latestMetricValue: 42.5
+          }
+        ]),
+        { status: 200 }
+      )
+    );
+
+    const api = new DevicesApiService(fetchMock as unknown as typeof fetch, 'http://localhost:5151/api');
+    const facade = new DevicePagesFacade(api, fetchMock as unknown as typeof fetch, 'http://localhost:5151/api');
+
+    const result = await facade.getDeviceList();
+
+    expect(result.state.status).toBe('ready');
+    expect(result.items.length).toBe(1);
+    expect(result.items[0].latestValue).toBe(42.5);
+    expect(result.items[0].latestValueDisplay).toBe('42.5');
+  });
+
   it('maps device list rows and placeholder values', async () => {
     const fetchMock = jasmine.createSpy('fetchMock').and.resolveTo(
       new Response(

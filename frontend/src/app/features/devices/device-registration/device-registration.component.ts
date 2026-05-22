@@ -23,7 +23,11 @@ export class DeviceRegistrationComponent {
   }
 
   async submitForm(): Promise<void> {
-    const response = await this.submit(this.externalId, this.name, this.sensorType);
-    this.submitMessage = response.ok ? 'Device registered successfully.' : 'Registration failed.';
+    try {
+      const response = await this.submit(this.externalId, this.name, this.sensorType);
+      this.submitMessage = response.ok ? 'Device registered successfully.' : 'Registration failed.';
+    } catch {
+      this.submitMessage = 'Registration failed. Unable to reach API.';
+    }
   }
 }
