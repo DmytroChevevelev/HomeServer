@@ -68,3 +68,47 @@ public class OpenApiContractTests
         Assert.True(responses.TryGetProperty("429", out _));
     }
 }
+
+internal static class OpenApiAssertions
+{
+    public static async Task<JsonDocument> GetSwaggerDocumentAsync(HttpClient client)
+    {
+        var response = await client.GetAsync("/swagger/v1/swagger.json");
+        response.EnsureSuccessStatusCode();
+
+        await using var stream = await response.Content.ReadAsStreamAsync();
+        return await JsonDocument.ParseAsync(stream);
+    }
+
+    public static JsonElement GetOperation(JsonDocument document, string path, string method)
+    {
+        return document.RootElement
+            .GetProperty("paths")
+            .GetProperty(path)
+            .GetProperty(method.ToLowerInvariant());
+    }
+
+    public static void AssertHasSummary(JsonElement operation)
+    {
+        Assert.True(operation.TryGetProperty("summary", out var summary));
+        Assert.False(string.IsNullOrWhiteSpace(summary.GetString()));
+    }
+
+    public static void AssertResponseDescription(JsonElement operation, params string[] statusCodes)
+    {
+        var responses = operation.GetProperty("responses");
+        foreach (var statusCode in statusCodes)
+        {
+            Assert.True(responses.TryGetProperty(statusCode, out var response));
+            Assert.True(response.TryGetProperty("description", out var description));
+            Assert.False(string.IsNullOrWhiteSpace(description.GetString()));
+        }
+    }
+
+    public static void AssertHasRequestBodyDescription(JsonElement operation)
+    {
+        Assert.True(operation.TryGetProperty("requestBody", out var requestBody));
+        Assert.True(requestBody.TryGetProperty("description", out var description));
+        Assert.False(string.IsNullOrWhiteSpace(description.GetString()));
+    }
+}

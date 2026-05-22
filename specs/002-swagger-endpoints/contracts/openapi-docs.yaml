@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Smart Home API Documentation Access
-  version: 1.0.0
+  version: 1.0.1
   description: Contract for interactive API documentation and machine-readable OpenAPI access.
 servers:
   - url: http://localhost:5151

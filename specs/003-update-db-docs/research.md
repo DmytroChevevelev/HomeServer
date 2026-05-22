@@ -27,3 +27,13 @@
 
 ## Resolved Clarifications
 - No unresolved NEEDS CLARIFICATION items remain.
+
+## Migration Decision Evidence (Task T014)
+
+- Branch selected: **A (new migration required)**.
+- `dotnet ef migrations add 0002_DatabaseSync --project backend/src/SmartHome.Api/SmartHome.Api.csproj --startup-project backend/src/SmartHome.Api/SmartHome.Api.csproj --output-dir infrastructure/migrations`
+	- Output summary: build succeeded, migration files generated (`20260522153827_0002_DatabaseSync.cs` and designer snapshot updates).
+- `pwsh scripts/apply-db-migrations.ps1`
+	- Pre-update summary: `20260522153827_0002_DatabaseSync (Pending)` detected.
+	- Update summary: database created, migration lock acquired, `Devices` and `TelemetryReadings` tables created, migration history inserted.
+	- Post-update summary: no pending migrations; script reported schema current.

@@ -20,7 +20,7 @@ Deliver a reliable database creation/update flow and tighten OpenAPI documentati
 
 **Testing**: xUnit unit/integration tests (`SmartHome.Api.UnitTests`, `SmartHome.Api.IntegrationTests`) with contract checks on Swagger JSON
 
-**Target Platform**: Local development environments (Windows/macOS/Linux) and CI test execution for backend service
+**Target Platform**: Local development environments (Windows/macOS/Linux) and CI integration test execution for backend service
 
 **Project Type**: Web application backend API with supporting frontend and simulator clients
 
@@ -28,7 +28,7 @@ Deliver a reliable database creation/update flow and tighten OpenAPI documentati
 
 **Constraints**: Must use migration-driven schema updates only; maintain docs environment-gating policy; endpoint documentation updates must align with `specs/002-swagger-endpoints/contracts/openapi-docs.yaml`
 
-**Scale/Scope**: Single backend service, existing device/telemetry routes, one feature-level migration/update cycle, and contract/doc coverage for modified endpoints
+**Scale/Scope**: Single backend service, existing device/telemetry routes, migration-application validation (and new migration creation only when model changes require it), and contract/doc coverage for modified endpoints
 
 ## Constitution Check
 
@@ -94,6 +94,7 @@ docs/
 ## Phase 0: Research Findings
 
 - Database synchronization SHOULD use EF Core migration commands (`dotnet ef database update`) as the canonical create/update mechanism for both fresh and existing environments.
+- New EF Core migration files SHOULD be created only when model or mapping changes require schema evolution; otherwise the workflow applies existing migrations.
 - Endpoint documentation quality SHOULD be enforced through OpenAPI metadata in endpoint mappings (`WithSummary`, parameter docs where applicable, and explicit `Produces` response docs).
 - Documentation route behavior MUST stay consistent with `specs/002-swagger-endpoints/contracts/openapi-docs.yaml` as the source-of-truth contract for `/swagger`, `/swagger/index.html`, and `/swagger/v1/swagger.json`.
 - Contract/integration tests SHOULD validate both availability policy and metadata completeness to prevent drift.
@@ -116,3 +117,9 @@ docs/
 ## Complexity Tracking
 
 No constitution violations identified.
+
+## Implementation Validation Notes
+
+- Migration diagnostics now log startup schema state without auto-applying migrations.
+- Configuration flags `Database:LogMigrationStateOnStartup`, `Database:ApplyMigrationsOnStartup`, and `Docs:RequireOpenApiMetadataDescriptions` are documented and active in development settings.
+- Integration tests verify migration workflow behavior, OpenAPI metadata coverage, contract-comment visibility, and docs route parity/restriction.

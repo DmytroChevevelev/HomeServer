@@ -11,3 +11,7 @@
 - Swagger UI is available in development mode.
 - Swagger JSON contract is available in development mode.
 - Swagger endpoints are blocked in non-development mode by default.
+- Database migration state is current in local validation runs.
+- CI validation includes schema synchronization checks.
+- Updated endpoints include OpenAPI summaries and response descriptions.
+- Updated request schemas expose input field descriptions where applicable.

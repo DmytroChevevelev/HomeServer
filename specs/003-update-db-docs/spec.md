@@ -66,7 +66,7 @@ As a QA engineer, I can trust that endpoint documentation comments and published
 
 - **FR-001**: System MUST provide a repeatable process to create the required database schema for a new environment.
 - **FR-002**: System MUST provide a repeatable process to update an existing database schema to the current required version.
-- **FR-003**: System MUST preserve existing valid operational data during in-scope schema updates.
+- **FR-003**: System MUST preserve existing valid operational data during in-scope schema updates, where in-scope data includes `Devices` and `TelemetryReadings` records plus their required relationships.
 - **FR-004**: System MUST expose clear endpoint documentation summaries for every endpoint created or modified by this feature.
 - **FR-005**: System MUST include parameter descriptions for documented endpoint inputs when parameters are applicable.
 - **FR-006**: System MUST include response descriptions for successful and failure outcomes for each endpoint created or modified by this feature.
@@ -92,7 +92,7 @@ As a QA engineer, I can trust that endpoint documentation comments and published
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of target environments can reach current schema state through the documented create/update flow without manual schema edits.
+- **SC-001**: 100% of supported local development and CI validation environments can reach current schema state through the documented create/update flow without manual schema edits.
 - **SC-002**: 100% of endpoints created or modified by this feature include a summary and response descriptions in generated API documentation.
 - **SC-003**: 100% of changed endpoints with parameters include parameter descriptions in generated API documentation.
 - **SC-004**: Contract consistency checks for this feature pass with zero unresolved documentation mismatches before release.
@@ -103,3 +103,4 @@ As a QA engineer, I can trust that endpoint documentation comments and published
 - The feature scope covers only schema and documentation changes required by current endpoint/contract updates, not a full data model redesign.
 - Endpoint and contract documentation standards already used in the project remain the baseline for wording and coverage expectations.
 - Teams will continue to use contract validation as a release gate for API documentation accuracy.
+- Supported environments for this feature are local developer machines and CI integration test runs; production rollout automation is out of scope.

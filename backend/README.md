@@ -32,6 +32,28 @@ The launch profile starts the API in `Development` and binds to `http://localhos
 
 Swagger is enabled in development and blocked by default in non-development environments.
 
+## Database Sync Workflow
+
+Use operator-run EF Core commands to keep schema state current. Startup automatic migration execution is intentionally disabled.
+
+```powershell
+Set-Location backend/src/SmartHome.Api
+dotnet ef migrations list
+dotnet ef database update
+```
+
+If migration state cannot be evaluated at startup, the API logs a warning and continues serving requests.
+
+## Endpoint Documentation Metadata
+
+For every endpoint or middleware updated in this feature:
+
+- OpenAPI `summary` and `description` must be present.
+- Response descriptions must be present for success and failure status codes.
+- Parameter/request property descriptions must be visible in generated OpenAPI schemas when inputs are present.
+
+The baseline docs-access route behavior remains aligned with `specs/002-swagger-endpoints/contracts/openapi-docs.yaml`.
+
 ## Tests
 
 ```powershell

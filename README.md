@@ -55,8 +55,12 @@ dotnet test backend/tests/SmartHome.Api.IntegrationTests/SmartHome.Api.Integrati
 - [Swagger feature specification](specs/002-swagger-endpoints/spec.md)
 - [Swagger implementation plan](specs/002-swagger-endpoints/plan.md)
 - [Swagger task list](specs/002-swagger-endpoints/tasks.md)
+- [DB sync and docs spec](specs/003-update-db-docs/spec.md)
+- [DB sync and docs plan](specs/003-update-db-docs/plan.md)
+- [DB sync and docs tasks](specs/003-update-db-docs/tasks.md)
 
 ## Notes
 
 - The backend exposes Swagger UI in development mode at `/swagger`.
-- The current feature branch is `002-swagger-endpoints`.
+- Database schema updates are operator-run using EF Core migration commands.
+- The current feature branch is `003-update-db-docs`.

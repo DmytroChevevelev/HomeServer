@@ -4,6 +4,8 @@
 - `dotnet restore backend/src/SmartHome.Api/SmartHome.Api.csproj`
 - `dotnet build backend/src/SmartHome.Api/SmartHome.Api.csproj`
 - `dotnet run --project backend/src/SmartHome.Api/SmartHome.Api.csproj`
+- `dotnet ef database update --project backend/src/SmartHome.Api/SmartHome.Api.csproj --startup-project backend/src/SmartHome.Api/SmartHome.Api.csproj`
+- `dotnet ef migrations list --project backend/src/SmartHome.Api/SmartHome.Api.csproj --startup-project backend/src/SmartHome.Api/SmartHome.Api.csproj`
 - `Invoke-WebRequest http://localhost:5151/swagger/v1/swagger.json | Select-Object -ExpandProperty StatusCode`
 - `Start-Process http://localhost:5151/swagger`
 
@@ -18,3 +20,7 @@
 ## Tests
 - `dotnet test backend/tests/SmartHome.Api.UnitTests/SmartHome.Api.UnitTests.csproj`
 - `dotnet test backend/tests/SmartHome.Api.IntegrationTests/SmartHome.Api.IntegrationTests.csproj`
+
+## Validation
+- `pwsh scripts/apply-db-migrations.ps1`
+- `pwsh scripts/validate-mvp.ps1`

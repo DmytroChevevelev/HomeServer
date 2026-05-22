@@ -27,6 +27,13 @@ builder.Services.AddSwaggerGen(options =>
         Version = "1.0.0",
         Description = "Interactive API documentation for Smart Home backend endpoints."
     });
+
+    var xmlFile = $"{typeof(Program).Assembly.GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
 });
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
@@ -40,9 +47,53 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+var migrationLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("DatabaseMigration");
+var logMigrationStateOnStartup = builder.Configuration.GetValue("Database:LogMigrationStateOnStartup", true);
+var applyMigrationsOnStartup = builder.Configuration.GetValue("Database:ApplyMigrationsOnStartup", false);
+
+if (applyMigrationsOnStartup)
+{
+    migrationLogger.LogWarning("Database:ApplyMigrationsOnStartup is enabled, but automatic migration execution is disabled by policy. Use operator-run migrations (dotnet ef database update).");
+}
+
+if (logMigrationStateOnStartup)
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<SmartHomeDbContext>();
+    try
+    {
+        if (dbContext.Database.ProviderName?.Contains("InMemory", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            migrationLogger.LogInformation("Migration-state diagnostics skipped for in-memory provider.");
+        }
+        else
+        {
+            var pendingMigrations = dbContext.Database.GetPendingMigrations().ToArray();
+            if (pendingMigrations.Length == 0)
+            {
+                migrationLogger.LogInformation("Database schema is current. No pending migrations detected.");
+            }
+            else
+            {
+                migrationLogger.LogWarning("Database has {Count} pending migrations: {Migrations}", pendingMigrations.Length, string.Join(", ", pendingMigrations));
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        migrationLogger.LogWarning(ex, "Unable to evaluate migration state on startup. Run operator migration commands to verify schema state.");
+    }
+}
+
 var docsEnabled = app.Environment.IsDevelopment()
     ? builder.Configuration.GetValue("Docs:EnabledInDevelopment", true)
     : builder.Configuration.GetValue("Docs:EnabledInNonDevelopment", false);
+var requireOpenApiMetadataDescriptions = builder.Configuration.GetValue("Docs:RequireOpenApiMetadataDescriptions", true);
+
+if (requireOpenApiMetadataDescriptions)
+{
+    app.Logger.LogInformation("OpenAPI metadata descriptions are required for modified endpoints in this feature.");
+}
 
 app.Use(async (context, next) =>
 {

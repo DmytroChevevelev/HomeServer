@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.OpenApi;
 using SmartHome.Api.Api.Contracts;
 using SmartHome.Api.Api.Errors;
 using SmartHome.Api.Infrastructure.Repositories;
@@ -41,6 +42,15 @@ public static class DevicesEndpoints
         .WithName("registerDevice")
         .WithSummary("Register a device")
         .WithDescription("Registers a new device using external id, name, and sensor type.")
+        .WithOpenApi(operation =>
+        {
+            operation.RequestBody ??= new Microsoft.OpenApi.Models.OpenApiRequestBody();
+            operation.RequestBody.Description = "Device registration payload containing external id, user-visible name, and sensor type.";
+            operation.Responses["201"].Description = "Device registered successfully.";
+            operation.Responses["400"].Description = "Required request fields are missing or invalid.";
+            operation.Responses["409"].Description = "A device with the same external id already exists.";
+            return operation;
+        })
         .Produces<DeviceResponse>(StatusCodes.Status201Created)
         .Produces<ValidationError>(StatusCodes.Status400BadRequest)
         .Produces<ValidationError>(StatusCodes.Status409Conflict);
@@ -53,6 +63,11 @@ public static class DevicesEndpoints
         .WithName("listDevices")
         .WithSummary("List devices with latest telemetry")
         .WithDescription("Returns registered devices and latest telemetry projections.")
+        .WithOpenApi(operation =>
+        {
+            operation.Responses["200"].Description = "Device list with latest telemetry projection was returned.";
+            return operation;
+        })
         .Produces<IEnumerable<DeviceLatestTelemetryResponse>>(StatusCodes.Status200OK);
 
         return app;

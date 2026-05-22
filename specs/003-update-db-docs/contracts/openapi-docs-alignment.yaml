@@ -44,7 +44,10 @@ x-operationDocumentationRequirements:
   sourceOfTruth: specs/002-swagger-endpoints/contracts/openapi-docs.yaml
   rules:
     - operation metadata for each modified endpoint MUST include summary
+    - operation metadata for each modified endpoint MUST include operation description
+    - request body documentation MUST include a non-empty description when a request body exists
     - endpoint parameters MUST include descriptions when parameters exist
+    - request schema properties MUST include descriptions for modified request DTO fields
     - documented responses MUST include descriptions for success and failure codes
   requiredOperations:
     - path: /api/devices
