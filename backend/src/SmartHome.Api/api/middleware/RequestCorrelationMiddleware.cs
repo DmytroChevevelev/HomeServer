@@ -2,6 +2,13 @@ using System.Diagnostics;
 
 namespace SmartHome.Api.Api.Middleware;
 
+public static class DocumentationPaths
+{
+    public const string UiRoutePrefix = "swagger";
+    public static readonly PathString UiRoot = new("/swagger");
+    public const string OpenApiJsonPath = "/swagger/v1/swagger.json";
+}
+
 public sealed class RequestCorrelationMiddleware(RequestDelegate next, ILogger<RequestCorrelationMiddleware> logger)
 {
     public async Task Invoke(HttpContext context)

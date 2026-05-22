@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info:
+  title: Smart Home API Documentation Access
+  version: 1.0.0
+  description: Contract for interactive API documentation and machine-readable OpenAPI access.
+servers:
+  - url: http://localhost:5151
+paths:
+  /swagger:
+    get:
+      summary: Documentation UI entry endpoint
+      operationId: getSwaggerUi
+      responses:
+        '200':
+          description: Documentation UI is available
+        '404':
+          description: Documentation UI is disabled by environment policy
+  /swagger/index.html:
+    get:
+      summary: Documentation UI index page
+      operationId: getSwaggerUiIndex
+      responses:
+        '200':
+          description: Documentation UI index page is available
+        '404':
+          description: Documentation UI is disabled by environment policy
+  /swagger/v1/swagger.json:
+    get:
+      summary: Machine-readable OpenAPI contract document
+      operationId: getOpenApiDocument
+      responses:
+        '200':
+          description: OpenAPI document is available
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: OpenAPI document is disabled by environment policy
+components: {}

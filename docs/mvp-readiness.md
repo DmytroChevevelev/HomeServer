@@ -8,3 +8,6 @@
 - Dashboard latest telemetry path works.
 - Structured errors are returned for invalid requests.
 - Basic logs include request correlation id.
+- Swagger UI is available in development mode.
+- Swagger JSON contract is available in development mode.
+- Swagger endpoints are blocked in non-development mode by default.

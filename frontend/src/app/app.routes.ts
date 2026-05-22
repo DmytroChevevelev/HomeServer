@@ -1,6 +1,3 @@
-import { DEVICES_ROUTES } from './features/devices/devices.routes';
+import { Routes } from '@angular/router';
 
-export const APP_ROUTES = [
-  ...DEVICES_ROUTES,
-  { path: 'dashboard', component: 'TelemetryDashboardComponent' }
-];
+export const routes: Routes = [];

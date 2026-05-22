@@ -1,0 +1,25 @@
+# .NET build outputs
+**/bin/
+**/obj/
+
+# Node/Angular
+node_modules/
+frontend/node_modules/
+dist/
+build/
+coverage/
+
+# Logs and temp
+*.log
+*.tmp
+*.swp
+.tmp-ng/
+
+# Environment and secrets
+.env*
+
+# IDE/OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
