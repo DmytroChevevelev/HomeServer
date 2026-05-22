@@ -456,3 +456,5 @@ D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\
 D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
 D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\SmartHome.Api.xml

@@ -153,3 +153,7 @@ D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\bin\Debug\net9.0\Sw
 D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\obj\Debug\net9.0\SmartHome.Api.MvcApplicationPartsAssemblyInfo.cs
+D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\bin\Debug\net9.0\SmartHome.Api.xml
+D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
+D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\obj\Debug\net9.0\swae.build.ex.cache
+D:\Projects\src\AgenticEngeneering\backend\src\SmartHome.Api\obj\Debug\net9.0\SmartHome.Api.xml
