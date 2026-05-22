@@ -103,6 +103,16 @@
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
 
+## Constitution Alignment *(mandatory)*
+
+- **MVP Slice**: Identify the smallest end-to-end slice this spec delivers first.
+- **API Contracts**: List new/changed endpoints and expected validation/error behavior.
+- **Testing Scope**: Define the minimum automated tests required for domain, integration,
+  and contract confidence.
+- **Observability**: Define logs/diagnostics needed to operate and debug the feature.
+- **Security/Configuration**: Document environment variables, CORS/origin implications,
+  secret handling, and misconfiguration fail-safe behavior.
+
 ## Success Criteria *(mandatory)*
 
 <!--

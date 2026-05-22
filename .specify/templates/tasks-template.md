@@ -13,6 +13,14 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+## Constitution-Driven Task Requirements
+
+- Include tasks that deliver at least one MVP vertical slice early (API -> persistence -> UI).
+- For endpoint or payload changes, include contract and validation/error-handling tasks.
+- For data model changes, include migration tasks and local reproducibility checks.
+- Include observability tasks (logging/diagnostics) for new ingestion, processing, or integration paths.
+- Include security/configuration tasks for environment settings, CORS/origin rules, and secret-safe defaults.
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)

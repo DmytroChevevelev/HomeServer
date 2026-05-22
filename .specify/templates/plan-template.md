@@ -40,7 +40,18 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- MVP Vertical Slice: Does the plan deliver at least one end-to-end, user-visible slice
+  (API -> persistence -> UI) without relying on unfinished parallel tracks?
+- API Contracts: Are request/response contracts, validation behavior, and error formats
+  defined for all new or changed endpoints?
+- Test and Data Integrity: Are required automated tests identified, and are migration/
+  schema-change steps explicitly documented when data model changes exist?
+- Observability: Are logs/health diagnostics defined for new ingestion, processing,
+  or integration paths?
+- Security and Configuration: Are environment settings, CORS/origin rules, and secret
+  handling documented with safe defaults?
+
+If any gate is not satisfied, document the gap and remediation in Complexity Tracking.
 
 ## Project Structure
 

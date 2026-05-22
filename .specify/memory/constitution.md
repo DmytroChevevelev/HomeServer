@@ -1,50 +1,89 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: template -> 1.0.0
+- Modified principles: Initial adoption (all principles newly defined)
+- Added sections: Engineering Standards; Workflow & Quality Gates
+- Removed sections: None
+- Templates requiring updates:
+  - ✅ .specify/templates/plan-template.md
+  - ✅ .specify/templates/spec-template.md
+  - ✅ .specify/templates/tasks-template.md
+  - ✅ .github/prompts/speckit.constitution.prompt.md (reviewed, no changes required)
+  - ✅ .github/prompts/speckit.plan.prompt.md (reviewed, no changes required)
+  - ✅ .github/prompts/speckit.tasks.prompt.md (reviewed, no changes required)
+- Follow-up TODOs: None
+-->
+
+# Smart Home Portal Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. MVP Vertical Slice First
+Every feature MUST be delivered as an end-to-end, independently demonstrable slice from API
+through persistence to UI. Work that cannot be validated through a user-visible outcome MUST
+not be prioritized ahead of MVP-critical flow. Rationale: this project optimizes for rapid,
+verifiable progress and avoids infrastructure-first drift.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Contract-Driven API and Validation
+All externally consumed API behavior MUST be defined through explicit request/response contracts,
+with deterministic validation and structured error responses. Breaking contract changes MUST be
+versioned and documented before implementation. Rationale: Angular UI, simulator, and backend
+depend on stable interfaces for safe parallel evolution.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Testable Changes and Data Integrity
+Changes affecting domain logic, ingestion, or persistence MUST include automated verification at
+the right level (unit, integration, or contract). Schema changes MUST use EF Core migrations and
+be reproducible in local environments. Rationale: telemetry correctness and data continuity are
+non-negotiable for monitoring credibility.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Observability by Default
+Backend and background processing MUST emit actionable logs and expose health-focused signals
+needed to diagnose failures in ingestion, persistence, and API delivery paths. New workflows MUST
+define minimum diagnostics before merge. Rationale: operational visibility is required to detect
+stale devices, ingestion issues, and regressions quickly.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Secure and Configurable Environments
+Configuration MUST be environment-specific, with no secrets committed to source control and with
+explicit CORS/origin and connection-string handling. Security-sensitive features MUST fail closed
+when misconfigured. Rationale: local-first delivery must not create unsafe defaults for later
+production deployment.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Engineering Standards
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Primary architecture MUST remain .NET 9 ASP.NET Core Web API, Angular frontend, SQL Server
+  Express (local default), and .NET simulator unless an amendment is approved.
+- Repository changes SHOULD preserve clear separation of concerns across API, UI, simulator,
+  and data access layers.
+- New dependencies MUST include a short justification in plan or task artifacts.
+- Feature artifacts MUST keep traceability from goals -> spec -> plan -> tasks.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Workflow & Quality Gates
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+1. Specification MUST define prioritized user stories, measurable outcomes, and explicit
+	constraints before planning.
+2. Implementation plans MUST pass Constitution Check gates covering MVP slice, contracts,
+	testing, observability, and security/configuration.
+3. Tasks MUST be grouped by user story and include required validation and migration work
+	where applicable.
+4. Pull request review MUST confirm constitutional compliance and document any justified
+	complexity exceptions.
+5. Release readiness for MVP increments MUST be verified through local end-to-end runs
+	(API + Angular + SQL Express + simulator).
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes conflicting process notes in repository documentation.
+Amendments require: (1) a written proposal, (2) impact assessment on templates/workflows,
+and (3) approval by project maintainers before merge.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Versioning policy:
+- MAJOR for incompatible governance changes or principle removal/redefinition.
+- MINOR for new principles/sections or materially expanded guidance.
+- PATCH for clarifications and non-semantic wording improvements.
+
+Compliance review expectations:
+- Every implementation plan and pull request MUST include a constitution compliance check.
+- Non-compliance MUST be resolved before merge or documented as an explicit, time-bound
+  exception with owner and remediation plan.
+
+**Version**: 1.0.0 | **Ratified**: 2026-05-22 | **Last Amended**: 2026-05-22

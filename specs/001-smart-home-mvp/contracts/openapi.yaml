@@ -1,0 +1,181 @@
+openapi: 3.0.3
+info:
+  title: Smart Home Portal MVP API
+  version: 1.0.0
+  description: API contracts for device registration, telemetry ingestion, and latest dashboard telemetry.
+servers:
+  - url: http://localhost:5151/api
+paths:
+  /devices:
+    post:
+      summary: Register device
+      operationId: registerDevice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDeviceRequest'
+      responses:
+        '201':
+          description: Device registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '409':
+          description: Duplicate external id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+    get:
+      summary: List devices with latest status
+      operationId: listDevices
+      responses:
+        '200':
+          description: Device list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceLatestTelemetry'
+  /telemetry:
+    post:
+      summary: Ingest telemetry event
+      operationId: ingestTelemetry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngestTelemetryRequest'
+      responses:
+        '202':
+          description: Telemetry accepted
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '429':
+          description: Ingestion throttled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /telemetry/latest:
+    get:
+      summary: Latest telemetry by device
+      operationId: getLatestTelemetry
+      responses:
+        '200':
+          description: Latest telemetry projection
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceLatestTelemetry'
+components:
+  schemas:
+    RegisterDeviceRequest:
+      type: object
+      required: [externalId, name, sensorType]
+      properties:
+        externalId:
+          type: string
+          minLength: 1
+          maxLength: 120
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        sensorType:
+          type: string
+          enum: [temperature, humidity, motion, custom]
+    IngestTelemetryRequest:
+      type: object
+      required: [deviceExternalId, metricType, metricValue, eventTimeUtc]
+      properties:
+        deviceExternalId:
+          type: string
+          minLength: 1
+        metricType:
+          type: string
+          enum: [temperature, humidity, motion, battery, custom]
+        metricValue:
+          type: number
+          format: double
+        eventTimeUtc:
+          type: string
+          format: date-time
+    Device:
+      type: object
+      required: [id, externalId, name, sensorType, registeredAtUtc]
+      properties:
+        id:
+          type: string
+          format: uuid
+        externalId:
+          type: string
+        name:
+          type: string
+        sensorType:
+          type: string
+        registeredAtUtc:
+          type: string
+          format: date-time
+    DeviceLatestTelemetry:
+      type: object
+      required: [deviceId, externalId, name, sensorType, status]
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+        externalId:
+          type: string
+        name:
+          type: string
+        sensorType:
+          type: string
+        latestMetricType:
+          type: string
+          nullable: true
+        latestMetricValue:
+          type: number
+          nullable: true
+        latestEventTimeUtc:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum: [active, stale]
+    ValidationError:
+      type: object
+      required: [code, message, requestId]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        field:
+          type: string
+          nullable: true
+        requestId:
+          type: string
