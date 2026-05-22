@@ -24,4 +24,21 @@ describe('DeviceRegistrationComponent', () => {
 
     expect(component.submitMessage).toBe('Registration failed. Unable to reach API.');
   });
+
+  it('submits complete payload including enabled flag', async () => {
+    const fixture = TestBed.createComponent(DeviceRegistrationComponent);
+    const component = fixture.componentInstance;
+
+    component.externalId = 'EXT-200';
+    component.name = 'Boiler Sensor';
+    component.sensorType = 'temperature';
+    component.isEnabled = false;
+
+    const submitSpy = spyOn(component, 'submit').and.resolveTo(new Response(null, { status: 201 }));
+
+    await component.submitForm();
+
+    expect(submitSpy).toHaveBeenCalledWith('EXT-200', 'Boiler Sensor', 'temperature', false);
+    expect(component.submitMessage).toBe('Device registered successfully.');
+  });
 });

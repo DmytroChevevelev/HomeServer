@@ -1,4 +1,46 @@
 <section class="device-details-page">
-  <h1>Device Details</h1>
-  <p>Device details and historical telemetry filter will be implemented in User Story 2 tasks.</p>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Device Details</h1>
+    <a class="btn btn-outline-secondary btn-sm" routerLink="/devices">Back to list</a>
+  </div>
+
+  <div *ngIf="uiState.status === 'loading'" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="uiState.status === 'error'" class="alert alert-danger" role="alert">
+    {{ uiState.errorMessage || 'Unable to load device details.' }}
+  </div>
+
+  <div *ngIf="item" class="card mb-3">
+    <div class="card-body">
+      <h2 class="h5">{{ item.name }}</h2>
+      <p class="mb-1"><strong>External ID:</strong> {{ item.externalId }}</p>
+      <p class="mb-1"><strong>Type:</strong> {{ item.deviceType }}</p>
+      <p class="mb-3"><strong>Status:</strong> {{ item.status }}</p>
+      <button type="button" class="btn btn-danger btn-sm" (click)="unregister()">Unregister Device</button>
+    </div>
+  </div>
+
+  <div *ngIf="unregisterMessage" class="alert alert-info" role="alert">
+    {{ unregisterMessage }}
+  </div>
+
+  <div class="card" *ngIf="item">
+    <div class="card-body">
+      <h2 class="h5">Telemetry</h2>
+      <div *ngIf="telemetryState.status === 'error'" class="alert alert-warning" role="alert">
+        {{ telemetryState.errorMessage || 'Unable to load telemetry.' }}
+      </div>
+      <p *ngIf="telemetryState.status === 'ready' && telemetryItems.length === 0" class="mb-0">No telemetry yet.</p>
+
+      <ul *ngIf="telemetryItems.length > 0" class="mb-0">
+        <li *ngFor="let telemetry of telemetryItems">
+          {{ telemetry.timestampUtc }} - {{ telemetry.metricType }}: {{ telemetry.metricValueDisplay }}
+        </li>
+      </ul>
+    </div>
+  </div>
 </section>

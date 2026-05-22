@@ -19,6 +19,11 @@ public sealed record RegisterDeviceRequest
     /// Sensor type classification used by telemetry processing.
     /// </summary>
     public string SensorType { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Optional enabled flag applied during registration. Defaults to true when omitted.
+    /// </summary>
+    public bool? IsEnabled { get; init; }
 }
 
 /// <summary>
@@ -38,3 +43,11 @@ public sealed record DeviceLatestTelemetryResponse(
     decimal? LatestMetricValue,
     DateTime? LatestEventTimeUtc,
     string Status);
+
+/// <summary>
+/// Response payload returned after a successful device unregister operation.
+/// </summary>
+/// <param name="DeviceId">Identifier of the removed device.</param>
+/// <param name="Success">Indicates whether the operation succeeded.</param>
+/// <param name="Message">Human-readable operation result.</param>
+public sealed record DeviceUnregisterResponse(Guid DeviceId, bool Success, string Message);

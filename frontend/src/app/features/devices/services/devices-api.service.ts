@@ -4,6 +4,7 @@ export interface RegisterDeviceRequest {
   externalId: string;
   name: string;
   sensorType: string;
+  isEnabled: boolean;
 }
 
 type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
@@ -26,6 +27,12 @@ export class DevicesApiService {
   async list(): Promise<Response> {
     return this.fetchFn(`${this.apiBaseUrl}/devices`, {
       method: 'GET'
+    });
+  }
+
+  async unregister(deviceId: string): Promise<Response> {
+    return this.fetchFn(`${this.apiBaseUrl}/devices/${encodeURIComponent(deviceId)}`, {
+      method: 'DELETE'
     });
   }
 }

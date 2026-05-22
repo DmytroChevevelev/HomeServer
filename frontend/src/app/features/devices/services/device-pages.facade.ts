@@ -21,6 +21,8 @@ interface DeviceApiDto {
   sensorType?: string;
   type?: string;
   status?: string;
+  registeredAtUtc?: string | null;
+  isEnabled?: boolean;
   latestValue?: number | null;
   latestMetricValue?: number | null;
   lastUpdatedUtc?: string | null;
@@ -47,6 +49,10 @@ export interface DeviceDetailsResult {
 export interface DeviceHistoryResult {
   state: UiSurfaceState;
   items: HistoricalTelemetryRowViewModel[];
+}
+
+export interface DeviceUnregisterResult {
+  state: UiSurfaceState;
 }
 
 export class DevicePagesFacade {
@@ -112,7 +118,7 @@ export class DevicePagesFacade {
             deviceType: selected.deviceType,
             status: selected.status,
             statusColor: selected.statusColor,
-            lastUpdatedUtc: null
+            lastUpdatedUtc: selected.latestEventTimeUtc
           }
         : null
     };
@@ -130,6 +136,11 @@ export class DevicePagesFacade {
     try {
       const response = await this.fetchFn(`${this.apiBaseUrl}/telemetry/latest`);
       if (!response.ok) {
+        console.warn('[DevicePagesFacade.getDeviceHistory] Request returned non-OK status.', {
+          status: response.status,
+          statusText: response.statusText,
+          apiBaseUrl: this.apiBaseUrl
+        });
         return {
           state: mapCollectionState<HistoricalTelemetryRowViewModel>(null, false, 'Unable to load telemetry history.'),
           items: []
@@ -153,10 +164,44 @@ export class DevicePagesFacade {
         state: mapCollectionState(items, false),
         items
       };
-    } catch {
+    } catch (error) {
+      console.error('[DevicePagesFacade.getDeviceHistory] Failed to load telemetry history.', {
+        apiBaseUrl: this.apiBaseUrl,
+        error
+      });
       return {
         state: mapCollectionState<HistoricalTelemetryRowViewModel>(null, false, 'Unable to load telemetry history.'),
         items: []
+      };
+    }
+  }
+
+  async unregisterDevice(deviceId: string): Promise<DeviceUnregisterResult> {
+    try {
+      const response = await this.devicesApi.unregister(deviceId);
+      if (!response.ok) {
+        console.warn('[DevicePagesFacade.unregisterDevice] Request returned non-OK status.', {
+          status: response.status,
+          statusText: response.statusText,
+          apiBaseUrl: this.apiBaseUrl,
+          deviceId
+        });
+        return {
+          state: { status: 'error', errorMessage: 'Unable to unregister device.' }
+        };
+      }
+
+      return {
+        state: { status: 'ready', errorMessage: null }
+      };
+    } catch (error) {
+      console.error('[DevicePagesFacade.unregisterDevice] Failed to unregister device.', {
+        apiBaseUrl: this.apiBaseUrl,
+        deviceId,
+        error
+      });
+      return {
+        state: { status: 'error', errorMessage: 'Unable to unregister device.' }
       };
     }
   }
@@ -172,8 +217,11 @@ export class DevicePagesFacade {
       deviceType: dto.sensorType ?? dto.type ?? 'unknown',
       status,
       statusColor: this.statusColor(status),
+      registeredAtUtc: dto.registeredAtUtc ?? null,
+      isEnabled: dto.isEnabled ?? true,
       latestValue,
-      latestValueDisplay: latestValue === null ? 'No value' : `${latestValue}`
+      latestValueDisplay: latestValue === null ? 'No value' : `${latestValue}`,
+      latestEventTimeUtc: dto.latestEventTimeUtc ?? dto.lastUpdatedUtc ?? null
     };
   }
 

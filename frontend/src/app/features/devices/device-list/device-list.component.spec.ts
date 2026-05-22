@@ -12,8 +12,11 @@ function makeDevice(overrides: Partial<DeviceListItemViewModel> = {}): DeviceLis
     deviceType: 'temperature',
     status: 'online',
     statusColor: '#16a34a',
+    registeredAtUtc: '2026-05-23T10:00:00Z',
+    isEnabled: true,
     latestValue: null,
     latestValueDisplay: 'No value',
+    latestEventTimeUtc: null,
     ...overrides
   };
 }
@@ -97,5 +100,36 @@ describe('DeviceListComponent', () => {
     component.setFilter('all');
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelectorAll('tbody tr').length).toBe(2);
+  });
+
+  it('renders latest telemetry value in visible row', async () => {
+    await setup(
+      { status: 'ready', errorMessage: null },
+      [makeDevice({ latestValue: 21.5, latestValueDisplay: '21.5' })]
+    );
+
+    const firstRowText = fixture.nativeElement.querySelector('tbody tr')?.textContent ?? '';
+    expect(firstRowText).toContain('21.5');
+  });
+
+  it('shows metadata row when expanded and hides when toggled again', async () => {
+    await setup({ status: 'ready', errorMessage: null }, [makeDevice()]);
+
+    let rows = fixture.nativeElement.querySelectorAll('tbody tr');
+    expect(rows.length).toBe(1);
+
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('tbody tr button');
+    button.click();
+    fixture.detectChanges();
+
+    rows = fixture.nativeElement.querySelectorAll('tbody tr');
+    expect(rows.length).toBe(2);
+    expect(fixture.nativeElement.textContent).toContain('Device ID:');
+
+    button.click();
+    fixture.detectChanges();
+
+    rows = fixture.nativeElement.querySelectorAll('tbody tr');
+    expect(rows.length).toBe(1);
   });
 });

@@ -20,5 +20,10 @@ public class OpenApiDevicesMetadataTests
         var listOperation = OpenApiAssertions.GetOperation(document, "/api/devices", "get");
         OpenApiAssertions.AssertHasSummary(listOperation);
         OpenApiAssertions.AssertResponseDescription(listOperation, "200");
+
+        var unregisterOperation = OpenApiAssertions.GetOperation(document, "/api/devices/{deviceId}", "delete");
+        OpenApiAssertions.AssertHasSummary(unregisterOperation);
+        OpenApiAssertions.AssertHasParameterDescription(unregisterOperation, "deviceId");
+        OpenApiAssertions.AssertResponseDescription(unregisterOperation, "200", "404");
     }
 }

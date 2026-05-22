@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,7 +46,9 @@ public sealed class IntegrationTestHost : WebApplicationFactory<Program>
             services.RemoveAll<DbContextOptions<SmartHomeDbContext>>();
             services.RemoveAll<IDbContextOptionsConfiguration<SmartHomeDbContext>>();
             services.AddDbContext<SmartHomeDbContext>(options =>
-                options.UseInMemoryDatabase(_databaseName, _databaseRoot));
+                options
+                    .UseInMemoryDatabase(_databaseName, _databaseRoot)
+                    .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)));
         });
     }
 

@@ -58,10 +58,26 @@ dotnet test backend/tests/SmartHome.Api.IntegrationTests/SmartHome.Api.Integrati
 - [DB sync and docs spec](specs/003-update-db-docs/spec.md)
 - [DB sync and docs plan](specs/003-update-db-docs/plan.md)
 - [DB sync and docs tasks](specs/003-update-db-docs/tasks.md)
+- [Device management updates spec](specs/008-device-management-updates/spec.md)
+- [Device management updates plan](specs/008-device-management-updates/plan.md)
+- [Device management updates tasks](specs/008-device-management-updates/tasks.md)
 
 ## Notes
 
 - The backend exposes Swagger UI in development mode at `/swagger`.
 - Database schema updates are operator-run using EF Core migration commands.
-- The current feature branch is `003-update-db-docs`.
+- The current feature branch is `008-device-management-updates`.
 - Browser API consumers must use an origin included in backend `Cors:AllowedOrigins`; otherwise browser calls (for example `/api/devices`) are blocked by CORS even when endpoint health is OK.
+
+## Device Management Workflow
+
+1. Register a device from the frontend page at `/devices/register` (or `POST /api/devices`).
+2. Open `/devices` and verify the latest telemetry value appears in each visible row.
+3. Expand a row to view metadata such as registration time and enabled state.
+4. Click a device name to open `/devices/:deviceId` details and telemetry.
+5. Unregister a device from the details page (or `DELETE /api/devices/{deviceId}`).
+
+## Logging Expectations
+
+- Backend uses Serilog structured logs for registration, unregister, telemetry ingestion, and projection flows.
+- Frontend logs operational failures to the browser console with operation context.

@@ -1,0 +1,9 @@
+.expand-col {
+	width: 3.25rem;
+}
+
+.metadata-grid {
+	display: grid;
+	gap: 0.35rem;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Linq;
 using SmartHome.Api.IntegrationTests.Infrastructure;
 using Xunit;
 
@@ -109,6 +110,17 @@ internal static class OpenApiAssertions
     {
         Assert.True(operation.TryGetProperty("requestBody", out var requestBody));
         Assert.True(requestBody.TryGetProperty("description", out var description));
+        Assert.False(string.IsNullOrWhiteSpace(description.GetString()));
+    }
+
+    public static void AssertHasParameterDescription(JsonElement operation, string parameterName)
+    {
+        Assert.True(operation.TryGetProperty("parameters", out var parameters));
+        var parameter = parameters.EnumerateArray().FirstOrDefault(candidate =>
+            candidate.TryGetProperty("name", out var name) && string.Equals(name.GetString(), parameterName, StringComparison.Ordinal));
+
+        Assert.True(parameter.ValueKind == JsonValueKind.Object, $"Parameter '{parameterName}' was not found.");
+        Assert.True(parameter.TryGetProperty("description", out var description));
         Assert.False(string.IsNullOrWhiteSpace(description.GetString()));
     }
 }

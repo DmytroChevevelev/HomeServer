@@ -37,21 +37,47 @@
   <table *ngIf="filteredDevices.length > 0" class="table table-hover align-middle">
     <thead class="table-dark">
       <tr>
+        <th scope="col" class="expand-col"></th>
         <th scope="col">Name</th>
         <th scope="col">External ID</th>
         <th scope="col">Type</th>
+        <th scope="col">Latest Value</th>
         <th scope="col">Status</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let device of filteredDevices">
-        <td>{{ device.name }}</td>
-        <td><code>{{ device.externalId }}</code></td>
-        <td>{{ device.deviceType }}</td>
-        <td>
-          <span [ngClass]="badgeClass(device.status)">{{ device.status }}</span>
-        </td>
-      </tr>
+      <ng-container *ngFor="let device of filteredDevices">
+        <tr>
+          <td class="expand-col">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary"
+              (click)="toggleExpanded(device.deviceId)">
+              {{ isExpanded(device.deviceId) ? '−' : '+' }}
+            </button>
+          </td>
+          <td>
+            <a [routerLink]="['/devices', device.deviceId]">{{ device.name }}</a>
+          </td>
+          <td><code>{{ device.externalId }}</code></td>
+          <td>{{ device.deviceType }}</td>
+          <td>{{ device.latestValueDisplay }}</td>
+          <td>
+            <span [ngClass]="badgeClass(device.status)">{{ device.status }}</span>
+          </td>
+        </tr>
+        <tr *ngIf="isExpanded(device.deviceId)" class="table-light">
+          <td></td>
+          <td colspan="5">
+            <div class="metadata-grid">
+              <div><strong>Device ID:</strong> {{ device.deviceId }}</div>
+              <div><strong>Enabled:</strong> {{ device.isEnabled ? 'Yes' : 'No' }}</div>
+              <div><strong>Registered:</strong> {{ device.registeredAtUtc || 'Unknown' }}</div>
+              <div><strong>Latest Event:</strong> {{ device.latestEventTimeUtc || 'No telemetry yet' }}</div>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
     </tbody>
   </table>
 </ng-container>

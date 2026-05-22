@@ -459,3 +459,12 @@ D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\
 D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\SmartHome.Api.xml
 D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\package-lock.json
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Serilog.dll
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Serilog.AspNetCore.dll
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Serilog.Extensions.Hosting.dll
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Serilog.Extensions.Logging.dll
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Serilog.Formatting.Compact.dll
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Serilog.Settings.Configuration.dll
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Serilog.Sinks.Console.dll
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Serilog.Sinks.Debug.dll
+D:\Projects\src\AgenticEngeneering\backend\tests\SmartHome.Api.IntegrationTests\bin\Debug\net9.0\Serilog.Sinks.File.dll

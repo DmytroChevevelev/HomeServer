@@ -9,8 +9,11 @@ export interface DeviceListItemViewModel {
   deviceType: string;
   status: DeviceStatus;
   statusColor: string;
+  registeredAtUtc: string | null;
+  isEnabled: boolean;
   latestValue: number | null;
   latestValueDisplay: string;
+  latestEventTimeUtc: string | null;
 }
 
 export interface DeviceDetailsHeaderViewModel {

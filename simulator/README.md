@@ -77,3 +77,11 @@ Telemetry profile file format example:
 
 - `start-send-telemetry` requires a valid device profile file matching `DeviceName`.
 - If `SendIntervalSeconds` is absent, zero, or invalid, the simulator falls back to 2 seconds.
+
+## Device Management Notes
+
+- Register the target device first from the frontend or API before running telemetry send commands.
+- Backend logs for ingest/register/unregister/list projection are emitted through Serilog.
+- Frontend request-flow failures are logged in the browser console with operation context.
+- The devices list now shows the latest telemetry value and supports expandable metadata rows.
+- Device details and unregister flow are available through `/devices/:deviceId`.

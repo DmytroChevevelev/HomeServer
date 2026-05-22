@@ -17,22 +17,27 @@ public static class TelemetryEndpoints
             DeviceRepository devices,
             TelemetryRepository telemetry,
             TelemetryIngestionService ingestion,
+            ILoggerFactory loggerFactory,
             ValidationErrorFactory errors,
             HttpContext context) =>
         {
+            var logger = loggerFactory.CreateLogger("Telemetry.Ingestion");
             if (string.IsNullOrWhiteSpace(request.DeviceExternalId) || string.IsNullOrWhiteSpace(request.MetricType))
             {
+                logger.LogWarning("Telemetry ingestion rejected due to missing required fields.");
                 return Results.BadRequest(errors.Create("validation_error", "Required fields are missing.", context));
             }
 
             var device = await devices.GetByExternalIdAsync(request.DeviceExternalId);
             if (device is null)
             {
+                logger.LogWarning("Telemetry ingestion rejected because device externalId {ExternalId} was not found.", request.DeviceExternalId);
                 return Results.NotFound(errors.Create("device_not_found", "Device does not exist.", context, "deviceExternalId"));
             }
 
             var entity = ingestion.ToEntity(device.Id, request);
             await telemetry.AddAsync(entity);
+            logger.LogInformation("Telemetry accepted for device {DeviceId} metric {MetricType} at {EventTimeUtc}.", device.Id, request.MetricType, request.EventTimeUtc);
             return Results.Accepted();
         })
         .WithName("ingestTelemetry")
@@ -53,9 +58,11 @@ public static class TelemetryEndpoints
         .Produces<ValidationError>(StatusCodes.Status404NotFound)
         .Produces<ValidationError>(StatusCodes.Status429TooManyRequests);
 
-        group.MapGet("/latest", async (LatestTelemetryQueryService latestService) =>
+        group.MapGet("/latest", async (LatestTelemetryQueryService latestService, ILoggerFactory loggerFactory) =>
         {
             var latest = await latestService.GetLatestAsync();
+            var logger = loggerFactory.CreateLogger("Telemetry.Latest");
+            logger.LogInformation("Returned latest telemetry projection for {Count} devices.", latest.Count);
             return Results.Ok(latest);
         })
         .WithName("getLatestTelemetry")

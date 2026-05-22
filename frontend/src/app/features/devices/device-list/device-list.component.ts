@@ -15,6 +15,7 @@ export class DeviceListComponent implements OnInit {
   allDevices: DeviceListItemViewModel[] = [];
   uiState: UiSurfaceState = { status: 'loading', errorMessage: null };
   selectedStatus: StatusFilterOption = 'all';
+  expandedDeviceIds = new Set<string>();
 
   private readonly facade = new DevicePagesFacade();
 
@@ -33,6 +34,19 @@ export class DeviceListComponent implements OnInit {
 
   setFilter(status: StatusFilterOption): void {
     this.selectedStatus = status;
+  }
+
+  toggleExpanded(deviceId: string): void {
+    if (this.expandedDeviceIds.has(deviceId)) {
+      this.expandedDeviceIds.delete(deviceId);
+      return;
+    }
+
+    this.expandedDeviceIds.add(deviceId);
+  }
+
+  isExpanded(deviceId: string): boolean {
+    return this.expandedDeviceIds.has(deviceId);
   }
 
   badgeClass(status: DeviceStatus): Record<string, boolean> {
