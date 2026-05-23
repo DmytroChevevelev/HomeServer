@@ -25,3 +25,29 @@ public sealed record IngestTelemetryRequest
 	/// </summary>
 	public DateTime EventTimeUtc { get; init; }
 }
+
+/// <summary>
+/// Telemetry history row returned for one selected device.
+/// </summary>
+/// <param name="DeviceId">Unique identifier of the device.</param>
+/// <param name="MetricType">Telemetry metric type, such as temperature or humidity.</param>
+/// <param name="MetricValue">Measured metric value for the event.</param>
+/// <param name="EventTimeUtc">Timestamp when the telemetry event occurred.</param>
+public sealed record DeviceTelemetryListItemResponse(
+	Guid DeviceId,
+	string MetricType,
+	decimal MetricValue,
+	DateTime EventTimeUtc);
+
+/// <summary>
+/// Realtime notification emitted when a device's latest sensor value changes.
+/// </summary>
+/// <param name="DeviceId">Unique identifier of the updated device.</param>
+/// <param name="LatestMetricValue">Most recent metric value after ingest.</param>
+/// <param name="LatestEventTimeUtc">Timestamp of the most recent telemetry event.</param>
+/// <param name="MetricType">Metric type that produced the latest value.</param>
+public sealed record SensorValueChangedNotification(
+	Guid DeviceId,
+	decimal? LatestMetricValue,
+	DateTime? LatestEventTimeUtc,
+	string MetricType);

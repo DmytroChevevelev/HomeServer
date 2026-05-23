@@ -17,6 +17,10 @@
   No devices registered yet.
 </div>
 
+<div *ngIf="realtimeWarning && uiState.status === 'ready'" class="alert alert-warning" role="alert">
+  {{ realtimeWarning }}
+</div>
+
 <ng-container *ngIf="uiState.status === 'ready'">
   <div class="mb-3">
     <select

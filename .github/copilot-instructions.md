@@ -1,6 +1,6 @@
 <!-- SPECKIT START -->
 For additional context about technologies, project structure, and workflow details,
-read `specs/008-device-management-updates/plan.md`.
+read `specs/009-portal-telemetry-realtime/plan.md`.
 <!-- SPECKIT END -->
 
 - For this feature, add documentation comments to any endpoint or middleware you create or modify. Use `specs/002-swagger-endpoints/contracts/openapi-docs.yaml` as the source of truth for the required documentation routes and their expected behavior. Ensure that each endpoint you implement or update for this feature includes an OpenAPI summary, parameter descriptions when applicable, and response descriptions that match the contract.
@@ -33,3 +33,9 @@ read `specs/008-device-management-updates/plan.md`.
 	- `const defaultFetch = (input, init) => globalThis.fetch(input, init)`
 - Add targeted logs in catch branches with operation name and inputs (such as `apiBaseUrl`) so fallback UI states preserve root-cause evidence.
 - Add or update focused tests for request flows affected by fetch injection changes.
+
+## Routing and End-to-End Data Flow Validation
+
+- Be careful with route composition and endpoint paths in both backend and frontend clients (for example, avoid accidental `/api` duplication or wrong hub/endpoint prefixes).
+- Before finalizing any fix, trace the full data path end-to-end: source event/request -> backend route -> service/repository -> response/event payload -> frontend mapping -> UI rendering.
+- If behavior appears broken, validate routing and end-to-end payload movement before assuming framework/runtime issues.

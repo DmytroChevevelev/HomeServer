@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using SmartHome.Api.Api.Endpoints;
 using SmartHome.Api.Api.Errors;
+using SmartHome.Api.Api.Hubs;
 using SmartHome.Api.Api.Middleware;
 using SmartHome.Api.Infrastructure;
 using SmartHome.Api.Infrastructure.Repositories;
@@ -22,8 +23,10 @@ builder.Services.AddScoped<DeviceRepository>();
 builder.Services.AddScoped<TelemetryRepository>();
 builder.Services.AddScoped<TelemetryIngestionService>();
 builder.Services.AddScoped<LatestTelemetryQueryService>();
+builder.Services.AddScoped<DeviceTelemetryHistoryQueryService>();
 builder.Services.AddSingleton<DeviceStatusEvaluator>();
 builder.Services.AddSingleton<ValidationErrorFactory>();
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -151,6 +154,7 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<IngestionRateLimiterMiddleware>();
 app.UseCors("Frontend");
 
+app.MapHub<TelemetryHub>("/hubs/telemetry");
 app.MapDevicesEndpoints();
 app.MapTelemetryEndpoints();
 

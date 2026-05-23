@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.OpenApi;
 using SmartHome.Api.Api.Contracts;
 using SmartHome.Api.Api.Errors;
+using SmartHome.Api.Api.Hubs;
 using SmartHome.Api.Infrastructure.Repositories;
 using SmartHome.Api.Services;
 
@@ -17,6 +19,7 @@ public static class TelemetryEndpoints
             DeviceRepository devices,
             TelemetryRepository telemetry,
             TelemetryIngestionService ingestion,
+            IHubContext<TelemetryHub> hubContext,
             ILoggerFactory loggerFactory,
             ValidationErrorFactory errors,
             HttpContext context) =>
@@ -37,6 +40,24 @@ public static class TelemetryEndpoints
 
             var entity = ingestion.ToEntity(device.Id, request);
             await telemetry.AddAsync(entity);
+            var latest = await telemetry.GetLatestForDeviceAsync(device.Id);
+
+            var notification = new SensorValueChangedNotification(
+                device.Id,
+                latest?.MetricValue,
+                latest?.EventTimeUtc,
+                request.MetricType);
+
+            try
+            {
+                await hubContext.Clients.All.SendAsync(TelemetryHub.SensorValueChangedEventName, notification);
+                logger.LogInformation("Published telemetry realtime update for device {DeviceId}.", device.Id);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to publish telemetry realtime update for device {DeviceId}.", device.Id);
+            }
+
             logger.LogInformation("Telemetry accepted for device {DeviceId} metric {MetricType} at {EventTimeUtc}.", device.Id, request.MetricType, request.EventTimeUtc);
             return Results.Accepted();
         })

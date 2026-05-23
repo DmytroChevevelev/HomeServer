@@ -33,6 +33,20 @@ export interface HistoricalTelemetryRowViewModel {
   metricValueDisplay: string;
 }
 
+export interface DeviceTelemetryListItemContract {
+  deviceId: string;
+  metricType: string;
+  metricValue: number;
+  eventTimeUtc: string;
+}
+
+export interface SensorValueChangedEventContract {
+  deviceId: string;
+  latestMetricValue: number | null;
+  latestEventTimeUtc: string | null;
+  metricType: string;
+}
+
 export interface DeviceHistoryFilterState {
   fromUtc: string;
   toUtc: string;

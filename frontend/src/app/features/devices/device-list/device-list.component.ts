@@ -1,7 +1,8 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DeviceListItemViewModel, DeviceStatus, StatusFilterOption, UiSurfaceState } from '../models/device-pages.models';
+import { DeviceTelemetryRealtimeService } from '../services/device-telemetry-realtime.service';
 import { DevicePagesFacade } from '../services/device-pages.facade';
 
 @Component({
@@ -11,18 +12,42 @@ import { DevicePagesFacade } from '../services/device-pages.facade';
   templateUrl: './device-list.component.html',
   styleUrl: './device-list.component.css'
 })
-export class DeviceListComponent implements OnInit {
+export class DeviceListComponent implements OnInit, OnDestroy {
   allDevices: DeviceListItemViewModel[] = [];
   uiState: UiSurfaceState = { status: 'loading', errorMessage: null };
+  realtimeWarning: string | null = null;
   selectedStatus: StatusFilterOption = 'all';
   expandedDeviceIds = new Set<string>();
 
   private readonly facade = new DevicePagesFacade();
+  private readonly realtime = new DeviceTelemetryRealtimeService();
+  private unsubscribeSensorValueChanged: (() => void) | null = null;
+  private unsubscribeConnectionState: (() => void) | null = null;
 
   async ngOnInit(): Promise<void> {
     const result = await this.facade.getDeviceList();
     this.allDevices = result.items;
     this.uiState = result.state;
+
+    this.unsubscribeSensorValueChanged = this.realtime.onSensorValueChanged((event) => {
+      this.allDevices = this.facade.applyRealtimeUpdate(this.allDevices, event);
+    });
+
+    this.unsubscribeConnectionState = this.realtime.onConnectionStateChanged((state) => {
+      this.realtimeWarning = state === 'connected' ? null : 'Realtime connection is unavailable. Latest values may be stale.';
+    });
+
+    try {
+      await this.realtime.start();
+    } catch {
+      this.realtimeWarning = 'Unable to start realtime updates. Latest values may be stale.';
+    }
+  }
+
+  async ngOnDestroy(): Promise<void> {
+    this.unsubscribeSensorValueChanged?.();
+    this.unsubscribeConnectionState?.();
+    await this.realtime.stop();
   }
 
   get filteredDevices(): DeviceListItemViewModel[] {

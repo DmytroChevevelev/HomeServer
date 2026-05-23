@@ -4,6 +4,7 @@ import {
   DeviceListItemViewModel,
   DeviceStatus,
   HistoricalTelemetryRowViewModel,
+  SensorValueChangedEventContract,
   UiSurfaceState
 } from '../models/device-pages.models';
 import { DateTimeRangeInput, validateDateTimeRange } from '../utils/date-time-filter.util';
@@ -204,6 +205,21 @@ export class DevicePagesFacade {
         state: { status: 'error', errorMessage: 'Unable to unregister device.' }
       };
     }
+  }
+
+  applyRealtimeUpdate(items: DeviceListItemViewModel[], event: SensorValueChangedEventContract): DeviceListItemViewModel[] {
+    return items.map((device) => {
+      if (device.deviceId !== event.deviceId) {
+        return device;
+      }
+
+      return {
+        ...device,
+        latestValue: event.latestMetricValue,
+        latestValueDisplay: event.latestMetricValue === null ? 'No value' : `${event.latestMetricValue}`,
+        latestEventTimeUtc: event.latestEventTimeUtc
+      };
+    });
   }
 
   private mapDeviceListItem(dto: DeviceApiDto): DeviceListItemViewModel {
