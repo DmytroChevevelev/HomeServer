@@ -6,37 +6,37 @@
 
 ## Summary
 
-Implement real-time sensor updates in the portal by introducing backend-to-frontend notification on telemetry ingestion and adding a selected-device telemetry-list endpoint. Update the frontend device list to react to backend notifications for Latest Value updates and replace the device-details telemetry section with a contract-aligned telemetry list.
+Deliver a real-time telemetry slice where the portal device list reflects live sensor-value changes and the device details page shows selected-device telemetry records from a dedicated endpoint. The design includes SignalR notifications, a latest-100 default telemetry-history API with configurable limits, and unregister behavior that removes related telemetry data.
 
 ## Technical Context
 
 **Language/Version**: C# (.NET 9), TypeScript (Angular 19), Markdown
 
-**Primary Dependencies**: ASP.NET Core Minimal APIs, ASP.NET Core SignalR, EF Core, existing repositories/services, Angular standalone components/services, Jasmine/Karma
+**Primary Dependencies**: ASP.NET Core Minimal APIs, ASP.NET Core SignalR, Entity Framework Core, Serilog, Angular standalone components/services, Jasmine/Karma
 
-**Storage**: SQL Server Express via existing SmartHome database and TelemetryReadings table
+**Storage**: SQL Server Express (SmartHome database, Devices and TelemetryReadings tables)
 
 **Testing**: xUnit (backend integration/unit), Jasmine/Karma (frontend unit/component)
 
-**Target Platform**: Local web deployment (SmartHome API + Angular SPA + simulator telemetry ingress)
+**Target Platform**: Local web app stack (ASP.NET Core API + Angular SPA + simulator telemetry ingestion)
 
-**Project Type**: Web application (backend API + frontend SPA)
+**Project Type**: Web application (backend + frontend)
 
-**Performance Goals**: Latest Value column updates visible in-session after ingest notification; selected-device telemetry list loads in under 3 seconds for normal local test datasets
+**Performance Goals**: Device list latest value updates in-session after telemetry ingest; selected-device telemetry list returns newest-first records with default limit 100
 
-**Constraints**: Preserve existing API contracts and HTTP methods as source of truth, keep CORS allowlist explicit, provide OpenAPI metadata for modified endpoints, keep logging actionable for notification and telemetry retrieval failures
+**Constraints**: Preserve API contracts and HTTP method intent; include OpenAPI metadata on changed endpoints; keep routing composition explicit (`/api` vs `/hubs`); ensure telemetry cleanup on device unregister
 
-**Scale/Scope**: Single feature slice across backend telemetry paths and frontend devices pages; no new top-level applications
+**Scale/Scope**: One backend API and one frontend devices feature module; no additional applications or infrastructure tracks
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- MVP Vertical Slice: PASS. Users can see latest values update in device list and inspect selected-device telemetry list from details in one end-to-end flow.
-- API Contracts: PASS. New GET `/api/devices/{deviceId}/telemetry` contract and notification payload are defined with validation/error expectations.
-- Test and Data Integrity: PASS. Plan includes backend endpoint/notification tests and frontend notification/list rendering tests; no schema change required.
-- Observability: PASS. Plan requires logging for notification publish, hub connection lifecycle, and telemetry retrieval failures.
-- Security and Configuration: PASS. Uses existing auth/CORS/configuration patterns; no secrets added; failures return safe user-facing errors.
+- MVP Vertical Slice: PASS. End-to-end flow includes telemetry ingest -> realtime notification -> list update and device-details telemetry history retrieval.
+- API Contracts: PASS. New selected-device telemetry endpoint is explicitly contracted with validation/error responses and OpenAPI metadata.
+- Test and Data Integrity: PASS. Plan includes backend endpoint and notification tests, frontend rendering/realtime tests, and unregister cleanup validation.
+- Observability: PASS. Logging requirements cover telemetry ingestion, realtime publish outcomes, and selected-device history retrieval.
+- Security and Configuration: PASS. Existing CORS/origin allowlist remains explicit, no secrets are added, and misconfiguration should fail safely.
 
 No constitution violations detected.
 
@@ -64,13 +64,13 @@ backend/
 │       ├── api/
 │       │   ├── contracts/
 │       │   ├── endpoints/
-│       │   └── middleware/
+│       │   └── hubs/
 │       ├── infrastructure/
-│       ├── models/
+│       │   └── repositories/
 │       └── services/
 └── tests/
-    ├── SmartHome.Api.UnitTests/
-    └── SmartHome.Api.IntegrationTests/
+    ├── SmartHome.Api.IntegrationTests/
+    └── SmartHome.Api.UnitTests/
 
 frontend/
 ├── src/
@@ -84,15 +84,15 @@ frontend/
 └── tests/
 ```
 
-**Structure Decision**: Extend existing backend endpoints/services and frontend devices feature modules. Add no new top-level projects.
+**Structure Decision**: Extend existing backend endpoint/repository/service layers and frontend devices feature modules; keep the current project topology unchanged.
 
 ## Phase 0: Research Output
 
 Research captured in [research.md](./research.md):
-- SignalR chosen for backend-to-frontend notification when telemetry is ingested.
-- New device-scoped telemetry list endpoint selected over frontend filtering of all-device projections.
-- Contract-driven DTO mapping preserved to avoid latest-value field drift.
-- Observability requirements defined for publish/reconnect/retrieval failures.
+- SignalR selected for backend-to-frontend sensor update notifications.
+- Device-scoped telemetry endpoint selected over frontend filtering.
+- Contract-driven field mapping retained to avoid DTO drift.
+- Observability requirements added for realtime and retrieval paths.
 
 ## Phase 1: Design Output
 
@@ -104,25 +104,20 @@ Post-design constitution re-check: PASS across all gates.
 
 ## Phase 2: Implementation Preview
 
-1. Backend notification pipeline
-   - Add SignalR hub route for telemetry notifications.
-   - Publish `sensorValueChanged` event after successful telemetry persistence.
-   - Add logging for publish success/failure and correlation context.
-2. Backend telemetry list endpoint
-   - Add `GET /api/devices/{deviceId}/telemetry` with optional date-range/limit filters.
-   - Return selected-device telemetry rows sorted by `eventTimeUtc` descending.
-   - Add OpenAPI summary, parameter docs, and response docs on endpoint.
-3. Frontend list real-time update
-   - Add notification client service and subscribe in device-list flow.
-   - Update Latest Value column on notification (patch or re-fetch by device).
-   - Preserve backend contract field names (`latestMetricValue`, `latestEventTimeUtc`).
-4. Frontend details telemetry list
-   - Replace generic telemetry section with list rendering bound to telemetry list contract.
-   - Load list from new device-scoped endpoint, including empty and error states.
-5. Testing and validation
-   - Backend integration tests for new endpoint filtering/order and notification publish trigger.
-   - Frontend unit/component tests for real-time list updates and details list contract rendering.
-   - End-to-end local validation using simulator telemetry ingestion.
+1. Realtime list updates
+   - Publish `sensorValueChanged` via SignalR after telemetry ingest persistence.
+   - Subscribe in device list and patch matching row latest value/time fields.
+2. Selected-device telemetry endpoint
+   - Add `GET /api/devices/{deviceId}/telemetry` with default `limit=100` and caller-specified limit support.
+   - Return newest-first telemetry rows for the selected device.
+3. Device details telemetry list UI
+   - Replace list source with selected-device endpoint.
+   - Add user control to specify returned telemetry count.
+4. Unregister data cleanup
+   - Ensure device unregister removes all related telemetry records to avoid dead data.
+5. Validation and tests
+   - Add/update backend integration tests for endpoint limit behavior and unregister cleanup.
+   - Add/update frontend tests for details list rendering and selectable limits.
 
 ## Complexity Tracking
 

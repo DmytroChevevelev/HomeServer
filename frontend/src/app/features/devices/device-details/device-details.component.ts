@@ -16,6 +16,7 @@ export class DeviceDetailsComponent implements OnInit {
   item: DeviceDetailsHeaderViewModel | null = null;
   telemetryState: UiSurfaceState = { status: 'loading', errorMessage: null };
   telemetryItems: HistoricalTelemetryRowViewModel[] = [];
+  telemetryLimit = 100;
   unregisterMessage = '';
 
   private deviceId = '';
@@ -58,10 +59,26 @@ export class DeviceDetailsComponent implements OnInit {
       return;
     }
 
+    await this.loadTelemetry();
+  }
+
+  async applyTelemetryLimit(limitValue: string): Promise<void> {
+    const parsed = Number.parseInt(limitValue, 10);
+    if (Number.isNaN(parsed)) {
+      return;
+    }
+
+    this.telemetryLimit = Math.min(Math.max(parsed, 1), 500);
+    await this.loadTelemetry();
+  }
+
+  private async loadTelemetry(): Promise<void> {
+    this.telemetryState = { status: 'loading', errorMessage: null };
     const historyResult = await this.facade.getDeviceHistory(this.deviceId, {
       fromUtc: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
       toUtc: new Date().toISOString()
-    });
+    }, this.telemetryLimit);
+
     this.telemetryState = historyResult.state;
     this.telemetryItems = historyResult.items;
   }

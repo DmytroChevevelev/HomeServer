@@ -118,4 +118,39 @@ describe('DevicePagesFacade', () => {
 
     expect(result.items[0].status).toBe('offline');
   });
+
+  it('loads selected-device telemetry from endpoint with limit and maps rows', async () => {
+    const fetchMock = jasmine.createSpy('fetchMock').and.resolveTo(
+      new Response(
+        JSON.stringify([
+          {
+            deviceId: 'd-1',
+            metricType: 'temperature',
+            metricValue: 30.25,
+            eventTimeUtc: '2026-05-23T11:30:00Z'
+          }
+        ]),
+        { status: 200 }
+      )
+    );
+
+    const api = new DevicesApiService(fetchMock as unknown as typeof fetch, 'http://localhost:5151/api');
+    const facade = new DevicePagesFacade(api, fetchMock as unknown as typeof fetch, 'http://localhost:5151/api');
+
+    const result = await facade.getDeviceHistory(
+      'd-1',
+      {
+        fromUtc: '2026-05-23T10:00:00.000Z',
+        toUtc: '2026-05-23T12:00:00.000Z'
+      },
+      25
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:5151/api/devices/d-1/telemetry?limit=25');
+    expect(result.state.status).toBe('ready');
+    expect(result.items.length).toBe(1);
+    expect(result.items[0].metricType).toBe('temperature');
+    expect(result.items[0].metricValueDisplay).toBe('30.25');
+    expect(result.items[0].timestampUtc).toBe('2026-05-23T11:30:00Z');
+  });
 });

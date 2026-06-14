@@ -45,6 +45,19 @@ public sealed record DeviceLatestTelemetryResponse(
     string Status);
 
 /// <summary>
+/// Telemetry history row returned for one selected device.
+/// </summary>
+/// <param name="DeviceId">Unique identifier of the device.</param>
+/// <param name="MetricType">Telemetry metric type, such as temperature or humidity.</param>
+/// <param name="MetricValue">Measured metric value for the event.</param>
+/// <param name="EventTimeUtc">Timestamp when the telemetry event occurred.</param>
+public sealed record DeviceTelemetryListItemResponse(
+    Guid DeviceId,
+    string MetricType,
+    decimal MetricValue,
+    DateTime EventTimeUtc);
+
+/// <summary>
 /// Response payload returned after a successful device unregister operation.
 /// </summary>
 /// <param name="DeviceId">Identifier of the removed device.</param>

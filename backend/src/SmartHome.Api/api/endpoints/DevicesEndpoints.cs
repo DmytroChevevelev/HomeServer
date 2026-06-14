@@ -81,6 +81,65 @@ public static class DevicesEndpoints
         })
         .Produces<IEnumerable<DeviceLatestTelemetryResponse>>(StatusCodes.Status200OK);
 
+        group.MapGet("/{deviceId:guid}/telemetry", async (
+            Guid deviceId,
+            int? limit,
+            DeviceRepository devices,
+            DeviceTelemetryHistoryQueryService history,
+            ValidationErrorFactory errors,
+            ILoggerFactory loggerFactory,
+            HttpContext context) =>
+        {
+            var logger = loggerFactory.CreateLogger("Devices.TelemetryList");
+
+            if (limit is <= 0)
+            {
+                logger.LogWarning("Telemetry list rejected for device {DeviceId} due to invalid limit {Limit}.", deviceId, limit);
+                return Results.BadRequest(errors.Create("validation_error", "Limit must be greater than zero.", context, "limit"));
+            }
+
+            var existing = await devices.GetByIdAsync(deviceId);
+            if (existing is null)
+            {
+                logger.LogWarning("Telemetry list rejected because device {DeviceId} was not found.", deviceId);
+                return Results.NotFound(errors.Create("device_not_found", "Device does not exist.", context, "deviceId"));
+            }
+
+            var safeLimit = limit ?? 100;
+            var telemetry = await history.GetForDeviceAsync(deviceId, null, null, safeLimit);
+            logger.LogInformation("Returned {Count} telemetry rows for device {DeviceId} with limit {Limit}.", telemetry.Count, deviceId, safeLimit);
+            return Results.Ok(telemetry);
+        })
+        .WithName("listDeviceTelemetry")
+        .WithSummary("List telemetry for selected device")
+        .WithDescription("Returns the latest telemetry records for a selected device. Defaults to the latest 100 records when limit is not provided.")
+        .WithOpenApi(operation =>
+        {
+            var deviceIdParameter = operation.Parameters?.FirstOrDefault(parameter =>
+                string.Equals(parameter.Name, "deviceId", StringComparison.OrdinalIgnoreCase));
+
+            if (deviceIdParameter is not null)
+            {
+                deviceIdParameter.Description = "Unique identifier of the device whose telemetry is requested.";
+            }
+
+            var limitParameter = operation.Parameters?.FirstOrDefault(parameter =>
+                string.Equals(parameter.Name, "limit", StringComparison.OrdinalIgnoreCase));
+
+            if (limitParameter is not null)
+            {
+                limitParameter.Description = "Maximum number of newest telemetry records to return. Defaults to 100 and supports up to 500.";
+            }
+
+            operation.Responses["200"].Description = "Telemetry rows for the selected device were returned in newest-first order.";
+            operation.Responses["400"].Description = "Limit query parameter is invalid.";
+            operation.Responses["404"].Description = "Selected device was not found.";
+            return operation;
+        })
+        .Produces<IEnumerable<DeviceTelemetryListItemResponse>>(StatusCodes.Status200OK)
+        .Produces<ValidationError>(StatusCodes.Status400BadRequest)
+        .Produces<ValidationError>(StatusCodes.Status404NotFound);
+
         group.MapDelete("/{deviceId:guid}", async (Guid deviceId, DeviceRepository devices, ValidationErrorFactory errors, ILoggerFactory loggerFactory, HttpContext context) =>
         {
             var logger = loggerFactory.CreateLogger("Devices.Unregister");
@@ -92,7 +151,7 @@ public static class DevicesEndpoints
             }
 
             await devices.DeleteAsync(existing);
-            logger.LogInformation("Device {DeviceId} (externalId {ExternalId}) was unregistered.", existing.Id, existing.ExternalId);
+            logger.LogInformation("Device {DeviceId} (externalId {ExternalId}) was unregistered with related telemetry removed.", existing.Id, existing.ExternalId);
             return Results.Ok(new DeviceUnregisterResponse(existing.Id, true, "Device unregistered successfully."));
         })
         .WithName("unregisterDevice")

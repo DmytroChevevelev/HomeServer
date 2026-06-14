@@ -8,6 +8,7 @@ ASP.NET Core Web API for the Smart Home Portal backend. It provides device regis
 - EF Core 9 with SQL Server
 - Structured validation and error responses
 - Swagger UI and OpenAPI JSON in development mode
+- SignalR telemetry notifications at `/hubs/telemetry`
 
 ## Prerequisites
 
@@ -65,6 +66,22 @@ For every endpoint or middleware updated in this feature:
 - Parameter/request property descriptions must be visible in generated OpenAPI schemas when inputs are present.
 
 The baseline docs-access route behavior remains aligned with `specs/002-swagger-endpoints/contracts/openapi-docs.yaml`.
+
+## Telemetry and Device Monitoring Endpoints
+
+- `POST /api/telemetry`: accepts telemetry readings and publishes `sensorValueChanged` SignalR events for device list realtime updates.
+- `GET /api/telemetry/latest`: returns latest telemetry projection per device.
+- `GET /api/devices/{deviceId}/telemetry?limit={n}`: returns telemetry history for one selected device ordered newest-first.
+
+Selected-device telemetry history behavior:
+- Default `limit` is 100 when omitted.
+- Allowed range for `limit` is 1 through 500.
+- Invalid `limit` returns `400 Bad Request`.
+- Unknown `deviceId` returns `404 Not Found`.
+
+Device unregister behavior:
+- `DELETE /api/devices/{deviceId}` removes the device and related telemetry rows.
+- Endpoint logs include telemetry cleanup confirmation for successful unregister operations.
 
 ## Tests
 

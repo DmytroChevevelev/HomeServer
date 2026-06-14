@@ -27,19 +27,6 @@ public sealed record IngestTelemetryRequest
 }
 
 /// <summary>
-/// Telemetry history row returned for one selected device.
-/// </summary>
-/// <param name="DeviceId">Unique identifier of the device.</param>
-/// <param name="MetricType">Telemetry metric type, such as temperature or humidity.</param>
-/// <param name="MetricValue">Measured metric value for the event.</param>
-/// <param name="EventTimeUtc">Timestamp when the telemetry event occurred.</param>
-public sealed record DeviceTelemetryListItemResponse(
-	Guid DeviceId,
-	string MetricType,
-	decimal MetricValue,
-	DateTime EventTimeUtc);
-
-/// <summary>
 /// Realtime notification emitted when a device's latest sensor value changes.
 /// </summary>
 /// <param name="DeviceId">Unique identifier of the updated device.</param>

@@ -8,6 +8,9 @@ paths:
       summary: Register device
     get:
       summary: List devices with status
+  /api/devices/{deviceId}/telemetry:
+    get:
+      summary: List selected device telemetry
   /api/telemetry:
     post:
       summary: Ingest telemetry

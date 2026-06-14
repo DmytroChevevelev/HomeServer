@@ -22,6 +22,22 @@ public sealed class DeviceRepository(SmartHomeDbContext db)
 
     public async Task DeleteAsync(Device device, CancellationToken ct = default)
     {
+        try
+        {
+            await db.TelemetryReadings
+                .Where(reading => reading.DeviceId == device.Id)
+                .ExecuteDeleteAsync(ct);
+        }
+        catch (InvalidOperationException)
+        {
+            // InMemory provider does not translate ExecuteDeleteAsync; remove rows through tracked entities for tests.
+            var telemetryRows = await db.TelemetryReadings
+                .Where(reading => reading.DeviceId == device.Id)
+                .ToListAsync(ct);
+
+            db.TelemetryReadings.RemoveRange(telemetryRows);
+        }
+
         db.Devices.Remove(device);
         await db.SaveChangesAsync(ct);
     }

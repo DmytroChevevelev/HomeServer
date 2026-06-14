@@ -132,4 +132,46 @@ describe('DeviceListComponent', () => {
     rows = fixture.nativeElement.querySelectorAll('tbody tr');
     expect(rows.length).toBe(1);
   });
+
+  it('shows realtime warning while disconnected and clears on reconnect', async () => {
+    const facade = makeFacade({ status: 'ready', errorMessage: null }, [makeDevice()]);
+
+    const realtimeMock = {
+      onSensorValueChanged: jasmine.createSpy('onSensorValueChanged').and.returnValue(() => undefined),
+      onConnectionStateChanged: jasmine
+        .createSpy('onConnectionStateChanged')
+        .and.callFake((handler: (state: 'disconnected' | 'connecting' | 'connected' | 'reconnecting') => void) => {
+          handler('disconnected');
+          return () => undefined;
+        }),
+      start: jasmine.createSpy('start').and.resolveTo(undefined),
+      stop: jasmine.createSpy('stop').and.resolveTo(undefined)
+    };
+
+    await TestBed.configureTestingModule({
+      imports: [DeviceListComponent],
+      providers: [
+        provideRouter([]),
+        { provide: DevicePagesFacade, useValue: facade }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(DeviceListComponent);
+    component = fixture.componentInstance;
+    (component as unknown as { facade: Partial<DevicePagesFacade> })['facade'] = facade;
+    (component as unknown as { realtime: typeof realtimeMock })['realtime'] = realtimeMock;
+
+    await component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(component.realtimeWarning).toContain('Realtime connection is unavailable');
+
+    const reconnectHandler = realtimeMock.onConnectionStateChanged.calls.mostRecent().args[0] as (
+      state: 'disconnected' | 'connecting' | 'connected' | 'reconnecting'
+    ) => void;
+    reconnectHandler('connected');
+    fixture.detectChanges();
+
+    expect(component.realtimeWarning).toBeNull();
+  });
 });

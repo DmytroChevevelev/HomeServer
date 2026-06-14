@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SmartHome.Simulator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5d82d24671d56ad720ea5b0aa467196f3af66f86")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6c74cd4faaaa7a400e43fbfe2ef5a73adeb017bc")]
 [assembly: System.Reflection.AssemblyProductAttribute("SmartHome.Simulator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SmartHome.Simulator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

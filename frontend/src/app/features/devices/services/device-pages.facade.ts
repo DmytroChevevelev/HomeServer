@@ -30,11 +30,11 @@ interface DeviceApiDto {
   latestEventTimeUtc?: string | null;
 }
 
-interface TelemetryApiDto {
+interface DeviceTelemetryApiDto {
   deviceId?: string;
-  timestampUtc?: string;
   metricType?: string;
-  value?: number;
+  metricValue?: number;
+  eventTimeUtc?: string;
 }
 
 export interface DeviceListResult {
@@ -125,7 +125,7 @@ export class DevicePagesFacade {
     };
   }
 
-  async getDeviceHistory(deviceId: string, filter: DateTimeRangeInput): Promise<DeviceHistoryResult> {
+  async getDeviceHistory(deviceId: string, filter: DateTimeRangeInput, limit = 100): Promise<DeviceHistoryResult> {
     const filterState = validateDateTimeRange(filter);
     if (!filterState.isValidRange) {
       return {
@@ -135,12 +135,16 @@ export class DevicePagesFacade {
     }
 
     try {
-      const response = await this.fetchFn(`${this.apiBaseUrl}/telemetry/latest`);
+      const safeLimit = Math.min(Math.max(Math.trunc(limit), 1), 500);
+      const telemetryUrl = `${this.apiBaseUrl}/devices/${encodeURIComponent(deviceId)}/telemetry?limit=${safeLimit}`;
+      const response = await this.fetchFn(telemetryUrl);
       if (!response.ok) {
         console.warn('[DevicePagesFacade.getDeviceHistory] Request returned non-OK status.', {
           status: response.status,
           statusText: response.statusText,
-          apiBaseUrl: this.apiBaseUrl
+          apiBaseUrl: this.apiBaseUrl,
+          deviceId,
+          limit: safeLimit
         });
         return {
           state: mapCollectionState<HistoricalTelemetryRowViewModel>(null, false, 'Unable to load telemetry history.'),
@@ -148,18 +152,16 @@ export class DevicePagesFacade {
         };
       }
 
-      const payload = (await response.json()) as TelemetryApiDto[];
-      const items = payload
-        .filter((item) => (item.deviceId ?? '') === deviceId)
-        .map((item) => {
-          const metricValue = item.value ?? 0;
-          return {
-            timestampUtc: item.timestampUtc ?? '',
-            metricType: item.metricType ?? 'unknown',
-            metricValue,
-            metricValueDisplay: `${metricValue}`
-          };
-        });
+      const payload = (await response.json()) as DeviceTelemetryApiDto[];
+      const items = payload.map((item) => {
+        const metricValue = item.metricValue ?? 0;
+        return {
+          timestampUtc: item.eventTimeUtc ?? '',
+          metricType: item.metricType ?? 'unknown',
+          metricValue,
+          metricValueDisplay: `${metricValue}`
+        };
+      });
 
       return {
         state: mapCollectionState(items, false),

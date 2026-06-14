@@ -35,6 +35,24 @@ API status values `active` → `online` and `stale` → `offline` are mapped in 
 - `pwsh scripts/apply-db-migrations.ps1`
 - `pwsh scripts/validate-mvp.ps1`
 
+## Telemetry Realtime and History Verification
+- Register device:
+	- `Invoke-RestMethod -Method Post -Uri http://localhost:5151/api/devices -ContentType 'application/json' -Body '{"externalId":"ext-docs-001","name":"Docs Sensor","sensorType":"temperature","isEnabled":true}'`
+- Send telemetry:
+	- `Invoke-RestMethod -Method Post -Uri http://localhost:5151/api/telemetry -ContentType 'application/json' -Body '{"deviceExternalId":"ext-docs-001","metricType":"temperature","metricValue":23.4,"eventTimeUtc":"2026-05-23T10:00:00Z"}'`
+- Verify device projection contains latest values:
+	- `Invoke-RestMethod -Method Get -Uri http://localhost:5151/api/devices`
+- Verify selected-device history default limit (100):
+	- `Invoke-RestMethod -Method Get -Uri http://localhost:5151/api/devices/{deviceId}/telemetry`
+- Verify selected-device history custom limit:
+	- `Invoke-RestMethod -Method Get -Uri http://localhost:5151/api/devices/{deviceId}/telemetry?limit=25`
+- Verify invalid telemetry limit returns 400:
+	- `Invoke-WebRequest -Method Get -Uri http://localhost:5151/api/devices/{deviceId}/telemetry?limit=0 -SkipHttpErrorCheck | Select-Object StatusCode`
+
+### Automated checks matching quickstart scenarios
+- `dotnet test backend/tests/SmartHome.Api.IntegrationTests/SmartHome.Api.IntegrationTests.csproj --filter "FullyQualifiedName~TelemetryRealtimeNotificationsTests|FullyQualifiedName~DeviceTelemetryHistoryEndpointTests|FullyQualifiedName~DeviceUnregisterEndpointTests"`
+- `cd frontend; npx ng test --watch=false --browsers=ChromeHeadless --include='src/app/features/devices/**/*.spec.ts'`
+
 ## CORS Troubleshooting (`/api/devices`)
 - Supported local frontend origins (development default):
 	- `http://localhost:4200`
