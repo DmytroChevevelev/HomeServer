@@ -1,0 +1,121 @@
+openapi: 3.0.3
+info:
+  title: Simulator Runtime Contract
+  version: 1.0.0
+  description: >-
+    User-facing runtime contract for the Smart Home simulator command loop,
+    configuration, telemetry profile lookup, and its dependency on existing
+    backend registration and telemetry endpoints.
+paths:
+  /simulator/commands:
+    get:
+      summary: List supported simulator commands
+      description: Returns the command set accepted by the interactive simulator runtime.
+      responses:
+        '200':
+          description: Supported commands were listed for the operator.
+  /simulator/commands/register-device:
+    post:
+      summary: Register the configured simulator device
+      description: >-
+        Sends the configured device identity to the existing backend device
+        registration endpoint and reports the outcome to the operator.
+      responses:
+        '200':
+          description: Command completed and device registration result was reported to the operator.
+        '409':
+          description: The configured device external id already exists in the backend.
+        '500':
+          description: The simulator could not complete the registration command because the backend or configuration was unavailable.
+  /simulator/commands/start-send-telemetry:
+    post:
+      summary: Start telemetry sending for the configured device
+      description: >-
+        Loads the telemetry values file for the configured device and starts one
+        active telemetry loop that submits readings to the backend at the active
+        interval.
+      responses:
+        '200':
+          description: Telemetry sending started successfully.
+        '409':
+          description: Telemetry sending was already active for the simulator process.
+        '422':
+          description: Telemetry could not start because the device-specific values file was missing or invalid.
+        '500':
+          description: Telemetry startup failed because backend communication could not be established.
+  /simulator/commands/stop-send-telemetry:
+    post:
+      summary: Stop active telemetry sending
+      description: Stops the currently active telemetry loop without exiting the simulator process.
+      responses:
+        '200':
+          description: Active telemetry sending stopped successfully.
+        '409':
+          description: No telemetry loop was active when the stop command was issued.
+components:
+  schemas:
+    SimulatorConfiguration:
+      type: object
+      required:
+        - ApiBaseUrl
+        - DeviceExternalId
+        - DeviceName
+        - SensorType
+      properties:
+        ApiBaseUrl:
+          type: string
+          description: Base URL for the backend API, typically ending in `/api`.
+        DeviceExternalId:
+          type: string
+          description: External device identifier used in registration and telemetry requests.
+        DeviceName:
+          type: string
+          description: Friendly device name used in registration and telemetry file lookup (`profiles/<DeviceName>.json`).
+        SensorType:
+          type: string
+          description: Sensor classification sent during device registration.
+        SendIntervalSeconds:
+          type: integer
+          default: 2
+          minimum: 1
+          description: Positive telemetry send interval in seconds; invalid values fall back to `2`.
+    TelemetryProfileFile:
+      type: object
+      required:
+        - metrics
+      properties:
+        metrics:
+          type: array
+          minItems: 1
+          description: Ordered telemetry values emitted during active send mode.
+          items:
+            type: object
+            required:
+              - metricType
+              - metricValue
+            properties:
+              metricType:
+                type: string
+                description: Metric label sent to the backend telemetry endpoint.
+              metricValue:
+                type: number
+                description: Numeric metric value sent to the backend telemetry endpoint.
+              eventTimeUtc:
+                type: string
+                format: date-time
+                description: Optional fixed event timestamp; omitted values are generated at send time.
+  x-backend-dependencies:
+    registerDeviceEndpoint:
+      path: /api/devices
+      method: POST
+      requestSchema: RegisterDeviceRequest
+    ingestTelemetryEndpoint:
+      path: /api/telemetry
+      method: POST
+      requestSchema: IngestTelemetryRequest
+  x-runtime-behavior:
+    defaultState: Idle
+    transitions:
+      - Idle -> Sending on successful start-send-telemetry
+      - Sending -> Idle on stop-send-telemetry
+      - Any -> Faulted when telemetry profile file is missing or malformed

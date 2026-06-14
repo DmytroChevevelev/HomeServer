@@ -1,0 +1,19 @@
+openapi: 3.0.3
+info:
+  title: Smart Home Api (Runtime Baseline)
+  version: 1.0.0
+paths:
+  /api/devices:
+    post:
+      summary: Register device
+    get:
+      summary: List devices with status
+  /api/devices/{deviceId}/telemetry:
+    get:
+      summary: List selected device telemetry
+  /api/telemetry:
+    post:
+      summary: Ingest telemetry
+  /api/telemetry/latest:
+    get:
+      summary: Get latest telemetry
