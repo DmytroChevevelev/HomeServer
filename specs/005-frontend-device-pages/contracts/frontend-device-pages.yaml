@@ -1,0 +1,86 @@
+openapi: 3.0.3
+info:
+  title: Frontend Device Pages Contract
+  version: 1.0.0
+  description: >-
+    Frontend interaction contract for device list, device details navigation,
+    historical filtering behavior, and registration-page navigation.
+paths:
+  /ui/devices:
+    get:
+      summary: Device list main page
+      description: Shows device rows with status indicator, type, and value when available.
+      responses:
+        '200':
+          description: Device list rendered in ready state.
+        '204':
+          description: Empty list state rendered with add/register action still visible.
+        '500':
+          description: Error state rendered with retry guidance.
+  /ui/devices/{deviceId}:
+    get:
+      summary: Device details page
+      description: Shows device header context and historical telemetry section for selected device.
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Selected device identifier from the list row.
+      responses:
+        '200':
+          description: Device details page rendered with header and historical section.
+        '404':
+          description: Not-found state shown when selected device no longer exists.
+  /ui/devices/{deviceId}/history/filter:
+    post:
+      summary: Apply date-time filter on device history
+      description: Applies from/to date-time range and updates historical list results.
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DateTimeRangeFilter'
+      responses:
+        '200':
+          description: Filter applied and history results updated.
+        '400':
+          description: Invalid date-time range validation displayed in UI.
+  /ui/devices/register:
+    get:
+      summary: Device registration page route
+      description: Opens registration page from main page add/register action.
+      responses:
+        '200':
+          description: Registration route loaded successfully.
+components:
+  schemas:
+    DateTimeRangeFilter:
+      type: object
+      required:
+        - fromUtc
+        - toUtc
+      properties:
+        fromUtc:
+          type: string
+          format: date-time
+          description: Inclusive lower bound for historical records.
+        toUtc:
+          type: string
+          format: date-time
+          description: Inclusive upper bound for historical records.
+  x-backend-dependencies:
+    listDevices:
+      path: /api/devices
+      method: GET
+    latestTelemetry:
+      path: /api/telemetry/latest
+      method: GET

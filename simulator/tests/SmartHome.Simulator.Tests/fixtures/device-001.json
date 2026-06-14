@@ -1,0 +1,12 @@
+{
+  "metrics": [
+    {
+      "metricType": "temperature",
+      "metricValue": 21.5
+    },
+    {
+      "metricType": "humidity",
+      "metricValue": 45.2
+    }
+  ]
+}
